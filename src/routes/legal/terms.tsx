@@ -8,7 +8,7 @@ export const Route = createFileRoute('/legal/terms')({
   head: () => ({
     meta: generatePageSEO({
       title: 'Terms of Service',
-      description: 'Terms of Service for Better-Starter',
+      description: 'Terms of Service for BetterStarter',
     }),
   }),
   component: TermsPage,

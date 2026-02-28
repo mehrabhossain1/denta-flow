@@ -26,9 +26,8 @@ export const subscription = pgTable('subscription', {
   id: text('id').primaryKey(),
   provider: text('provider').notNull(),
   subscriptionId: text('subscription_id').notNull(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
+  userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+  guestEmail: text('guest_email'),
   status: text('status').notNull(),
   productId: text('product_id'),
   priceId: text('price_id'),
@@ -51,9 +50,8 @@ export const entitlement = pgTable('entitlement', {
   id: text('id').primaryKey(),
   provider: text('provider').notNull(),
   sourceId: text('source_id').notNull(), // checkout session or payment intent ID
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
+  userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+  guestEmail: text('guest_email'),
   productId: text('product_id').notNull(),
   grantedAt: timestamp('granted_at').defaultNow().notNull(),
   expiresAt: timestamp('expires_at'),

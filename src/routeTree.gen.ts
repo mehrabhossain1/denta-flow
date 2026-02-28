@@ -9,19 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as AccountRouteRouteImport } from './routes/account/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as PurchaseSuccessRouteImport } from './routes/purchase/success'
 import { Route as LegalTermsRouteImport } from './routes/legal/terms'
 import { Route as LegalPrivacyRouteImport } from './routes/legal/privacy'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AuthAuthViewRouteImport } from './routes/auth/$authView'
-import { Route as ApiTunnelRouteImport } from './routes/api/tunnel'
 import { Route as AccountAccountViewRouteImport } from './routes/account/$accountView'
-import { Route as ApiUploadthingSplatRouteImport } from './routes/api/uploadthing/$'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
+import { Route as ApiRssXmlRouteImport } from './routes/api/rss.xml'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RssDotxmlRoute = RssDotxmlRouteImport.update({
+  id: '/rss.xml',
+  path: '/rss.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -35,6 +48,11 @@ const AccountRouteRoute = AccountRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PurchaseSuccessRoute = PurchaseSuccessRouteImport.update({
@@ -52,14 +70,14 @@ const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
   path: '/legal/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthAuthViewRoute = AuthAuthViewRouteImport.update({
   id: '/auth/$authView',
   path: '/auth/$authView',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiTunnelRoute = ApiTunnelRouteImport.update({
-  id: '/api/tunnel',
-  path: '/api/tunnel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountAccountViewRoute = AccountAccountViewRouteImport.update({
@@ -67,14 +85,14 @@ const AccountAccountViewRoute = AccountAccountViewRouteImport.update({
   path: '/$accountView',
   getParentRoute: () => AccountRouteRoute,
 } as any)
-const ApiUploadthingSplatRoute = ApiUploadthingSplatRouteImport.update({
-  id: '/api/uploadthing/$',
-  path: '/api/uploadthing/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   id: '/api/stripe/webhook',
   path: '/api/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRssXmlRoute = ApiRssXmlRouteImport.update({
+  id: '/api/rss/xml',
+  path: '/api/rss/xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -87,44 +105,53 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRoute
+  '/rss.xml': typeof RssDotxmlRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account/$accountView': typeof AccountAccountViewRoute
-  '/api/tunnel': typeof ApiTunnelRoute
   '/auth/$authView': typeof AuthAuthViewRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/purchase/success': typeof PurchaseSuccessRoute
+  '/blog/': typeof BlogIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/rss/xml': typeof ApiRssXmlRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
-  '/api/uploadthing/$': typeof ApiUploadthingSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRoute
+  '/rss.xml': typeof RssDotxmlRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account/$accountView': typeof AccountAccountViewRoute
-  '/api/tunnel': typeof ApiTunnelRoute
   '/auth/$authView': typeof AuthAuthViewRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/purchase/success': typeof PurchaseSuccessRoute
+  '/blog': typeof BlogIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/rss/xml': typeof ApiRssXmlRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
-  '/api/uploadthing/$': typeof ApiUploadthingSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRoute
+  '/rss.xml': typeof RssDotxmlRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account/$accountView': typeof AccountAccountViewRoute
-  '/api/tunnel': typeof ApiTunnelRoute
   '/auth/$authView': typeof AuthAuthViewRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/purchase/success': typeof PurchaseSuccessRoute
+  '/blog/': typeof BlogIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/rss/xml': typeof ApiRssXmlRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
-  '/api/uploadthing/$': typeof ApiUploadthingSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,61 +159,87 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/dashboard'
+    | '/rss.xml'
+    | '/sitemap.xml'
     | '/account/$accountView'
-    | '/api/tunnel'
     | '/auth/$authView'
+    | '/blog/$slug'
     | '/legal/privacy'
     | '/legal/terms'
     | '/purchase/success'
+    | '/blog/'
     | '/api/auth/$'
+    | '/api/rss/xml'
     | '/api/stripe/webhook'
-    | '/api/uploadthing/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account'
     | '/dashboard'
+    | '/rss.xml'
+    | '/sitemap.xml'
     | '/account/$accountView'
-    | '/api/tunnel'
     | '/auth/$authView'
+    | '/blog/$slug'
     | '/legal/privacy'
     | '/legal/terms'
     | '/purchase/success'
+    | '/blog'
     | '/api/auth/$'
+    | '/api/rss/xml'
     | '/api/stripe/webhook'
-    | '/api/uploadthing/$'
   id:
     | '__root__'
     | '/'
     | '/account'
     | '/dashboard'
+    | '/rss.xml'
+    | '/sitemap.xml'
     | '/account/$accountView'
-    | '/api/tunnel'
     | '/auth/$authView'
+    | '/blog/$slug'
     | '/legal/privacy'
     | '/legal/terms'
     | '/purchase/success'
+    | '/blog/'
     | '/api/auth/$'
+    | '/api/rss/xml'
     | '/api/stripe/webhook'
-    | '/api/uploadthing/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRouteRoute: typeof AccountRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRoute
-  ApiTunnelRoute: typeof ApiTunnelRoute
+  RssDotxmlRoute: typeof RssDotxmlRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AuthAuthViewRoute: typeof AuthAuthViewRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalTermsRoute: typeof LegalTermsRoute
   PurchaseSuccessRoute: typeof PurchaseSuccessRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiRssXmlRoute: typeof ApiRssXmlRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
-  ApiUploadthingSplatRoute: typeof ApiUploadthingSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rss.xml': {
+      id: '/rss.xml'
+      path: '/rss.xml'
+      fullPath: '/rss.xml'
+      preLoaderRoute: typeof RssDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -206,6 +259,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/purchase/success': {
@@ -229,18 +289,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/$authView': {
       id: '/auth/$authView'
       path: '/auth/$authView'
       fullPath: '/auth/$authView'
       preLoaderRoute: typeof AuthAuthViewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/tunnel': {
-      id: '/api/tunnel'
-      path: '/api/tunnel'
-      fullPath: '/api/tunnel'
-      preLoaderRoute: typeof ApiTunnelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/$accountView': {
@@ -250,18 +310,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAccountViewRouteImport
       parentRoute: typeof AccountRouteRoute
     }
-    '/api/uploadthing/$': {
-      id: '/api/uploadthing/$'
-      path: '/api/uploadthing/$'
-      fullPath: '/api/uploadthing/$'
-      preLoaderRoute: typeof ApiUploadthingSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/stripe/webhook': {
       id: '/api/stripe/webhook'
       path: '/api/stripe/webhook'
       fullPath: '/api/stripe/webhook'
       preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/rss/xml': {
+      id: '/api/rss/xml'
+      path: '/api/rss/xml'
+      fullPath: '/api/rss/xml'
+      preLoaderRoute: typeof ApiRssXmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -290,14 +350,17 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRouteRoute: AccountRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRoute,
-  ApiTunnelRoute: ApiTunnelRoute,
+  RssDotxmlRoute: RssDotxmlRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AuthAuthViewRoute: AuthAuthViewRoute,
+  BlogSlugRoute: BlogSlugRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalTermsRoute: LegalTermsRoute,
   PurchaseSuccessRoute: PurchaseSuccessRoute,
+  BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiRssXmlRoute: ApiRssXmlRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
-  ApiUploadthingSplatRoute: ApiUploadthingSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

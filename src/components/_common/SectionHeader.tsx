@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 interface SectionHeaderProps {
-  title: string
+  title: ReactNode
   description: ReactNode
 }
 

@@ -1,6 +1,5 @@
 import { DefaultCatchBoundary } from '@/components/_common/DefaultCacheBoundry'
 import { PageNotFound } from '@/components/_common/PageNotFound'
-import { sentryInit } from '@/lib/sentry'
 import { routeTree } from '@/routeTree.gen'
 import { createRouter } from '@tanstack/react-router'
 
@@ -18,10 +17,6 @@ export const router = createRouter({
 })
 
 export function getRouter() {
-  if (!router.isServer) {
-    sentryInit(router)
-  }
-
   return router
 }
 

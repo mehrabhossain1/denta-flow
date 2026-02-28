@@ -6,7 +6,7 @@ const TECH_STACK = [
     logo: '/brands/tanstack.png',
     tagline: 'Better than Next.js',
     description:
-      'Easier, Faster, Type-safe. Deploy anywhere: Netlify, Vercel etc.',
+      'Easier, Faster, Type-safe. Deploy anywhere: Vercel, Cloudflare etc.',
   },
   {
     name: 'Drizzle - Database Integration',

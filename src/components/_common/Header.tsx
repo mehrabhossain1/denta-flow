@@ -41,11 +41,12 @@ const handleNavClick = (
 const Header = () => {
   const routerState = useRouterState()
   const isHomePage = routerState.location.pathname === HOME_PATH
+  const isFullWidth = routerState.location.pathname.startsWith('/docs')
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/40">
       <nav
-        className="navbar mx-auto max-w-7xl py-1.5 px-2 sm:px-8 "
+        className={`navbar mx-auto ${isFullWidth ? 'w-full' : 'max-w-7xl'} py-1.5 px-2 sm:px-8 `}
         aria-label="Global"
       >
         <div className="flex w-full items-center gap-1">

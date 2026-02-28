@@ -1,6 +1,7 @@
 import { BILLING_CONFIG } from '@/constants/billing'
 import { db } from '@/db'
 import { entitlement, subscription } from '@/db/schema'
+import { env } from '@/env'
 import { authMiddleware } from '@/lib/auth/middleware'
 import { provider } from '@/lib/billing/providers'
 import type { CheckoutMode, LineItem } from '@/lib/billing/types'
@@ -24,7 +25,7 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
   .handler(async ({ context, data }) => {
     const input = data as unknown as CreateCheckoutInput
 
-    const baseUrl = process.env.APP_BASE_URL as string
+    const baseUrl = env.APP_BASE_URL
     const successUrl = `${baseUrl}${BILLING_CONFIG.SUCCESS_PATH}?session_id={CHECKOUT_SESSION_ID}`
     const cancelUrl = `${baseUrl}${BILLING_CONFIG.CANCEL_PATH}`
 
@@ -48,7 +49,7 @@ export const createBillingPortalSession = createServerFn({ method: 'POST' })
       throw new Error('UNAUTHORIZED')
     }
 
-    const baseUrl = process.env.APP_BASE_URL as string
+    const baseUrl = env.APP_BASE_URL
     const returnUrl = `${baseUrl}${BILLING_CONFIG.SUCCESS_PATH}`
 
     const result = await provider.createPortalSession({
@@ -96,7 +97,7 @@ export const getCheckoutSession = createServerFn({ method: 'GET' })
 /**
  * Claims entitlements purchased as a guest.
  * This should be called after a user signs in/up with the same email used during checkout.
- * Guest entitlements are stored with userId = 'guest:{email}'
+ * Guest entitlements are stored with guestEmail
  */
 export const claimGuestEntitlements = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
@@ -105,13 +106,13 @@ export const claimGuestEntitlements = createServerFn({ method: 'POST' })
       throw new Error('UNAUTHORIZED')
     }
 
-    const guestUserId = `guest:${context.user.email}`
+    const guestEmail = context.user.email
 
     // Find any entitlements for this guest email
     const guestEntitlements = await db
       .select()
       .from(entitlement)
-      .where(eq(entitlement.userId, guestUserId))
+      .where(eq(entitlement.guestEmail, guestEmail))
 
     if (guestEntitlements.length === 0) {
       return { claimed: 0 }
@@ -120,20 +121,20 @@ export const claimGuestEntitlements = createServerFn({ method: 'POST' })
     // Transfer entitlements to the authenticated user
     await db
       .update(entitlement)
-      .set({ userId: context.user.id })
-      .where(eq(entitlement.userId, guestUserId))
+      .set({ userId: context.user.id, guestEmail: null })
+      .where(eq(entitlement.guestEmail, guestEmail))
 
     // Also check for guest subscriptions
     const guestSubs = await db
       .select()
       .from(subscription)
-      .where(eq(subscription.userId, guestUserId))
+      .where(eq(subscription.guestEmail, guestEmail))
 
     if (guestSubs.length > 0) {
       await db
         .update(subscription)
-        .set({ userId: context.user.id })
-        .where(eq(subscription.userId, guestUserId))
+        .set({ userId: context.user.id, guestEmail: null })
+        .where(eq(subscription.guestEmail, guestEmail))
     }
 
     return {

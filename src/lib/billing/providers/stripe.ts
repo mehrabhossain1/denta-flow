@@ -92,7 +92,8 @@ function normalizeLineItems(
 }
 
 async function upsertSubscription(
-  userId: string,
+  userId: string | null,
+  guestEmail: string | null,
   sub: Stripe.Subscription,
 ): Promise<void> {
   const subId = sub.id
@@ -119,6 +120,7 @@ async function upsertSubscription(
     provider: BILLING_PROVIDERS.STRIPE,
     subscriptionId: subId,
     userId,
+    guestEmail,
     status,
     priceId,
     productId,
@@ -148,7 +150,8 @@ async function upsertSubscription(
 }
 
 async function grantEntitlement(
-  userId: string,
+  userId: string | null,
+  guestEmail: string | null,
   productId: string,
   sourceId: string,
 ): Promise<void> {
@@ -167,6 +170,7 @@ async function grantEntitlement(
     provider: BILLING_PROVIDERS.STRIPE,
     sourceId,
     userId,
+    guestEmail,
     productId,
   })
 }
@@ -201,7 +205,17 @@ export const stripeProvider: BillingProvider = {
         mode,
         ...metadata,
       },
-      allow_promotion_codes: true,
+      ...(STRIPE_CONFIG.PROMOTION_CODE_ID
+        ? {
+            discounts: [
+              {
+                promotion_code: STRIPE_CONFIG.PROMOTION_CODE_ID,
+              },
+            ],
+          }
+        : {
+            allow_promotion_codes: true,
+          }),
     })
 
     if (!session.url) {
@@ -253,7 +267,9 @@ export const stripeProvider: BillingProvider = {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        const userId = session.metadata?.user_id
+        const rawUserId = session.metadata?.user_id
+        const userId =
+          rawUserId && rawUserId.trim().length > 0 ? rawUserId : null
         const mode = (session.metadata?.mode ?? session.mode) as
           | 'subscription'
           | 'payment'
@@ -262,9 +278,9 @@ export const stripeProvider: BillingProvider = {
         // For authenticated users, use their ID
         // For guests, we'll store entitlement with email-based placeholder
         // The entitlement will be claimed when user signs up with that email
-        const effectiveUserId = userId || `guest:${customerEmail}`
+        const guestEmail = userId ? null : (customerEmail ?? null)
 
-        if (!effectiveUserId || effectiveUserId === 'guest:null') {
+        if (!userId && !guestEmail) {
           console.warn(
             '[stripe] checkout.session.completed: no user_id or customer email',
           )
@@ -276,11 +292,16 @@ export const stripeProvider: BillingProvider = {
           typeof session.subscription === 'string'
         ) {
           const sub = await stripe.subscriptions.retrieve(session.subscription)
-          await upsertSubscription(effectiveUserId, sub)
+          await upsertSubscription(userId ?? null, guestEmail, sub)
         } else if (mode === 'payment') {
           const productId =
             session.metadata?.product_id ?? STRIPE_CONFIG.PRODUCTS.CORE.id
-          await grantEntitlement(effectiveUserId, productId, session.id)
+          await grantEntitlement(
+            userId ?? null,
+            guestEmail,
+            productId,
+            session.id,
+          )
         }
         break
       }
@@ -289,7 +310,8 @@ export const stripeProvider: BillingProvider = {
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted': {
         const sub = event.data.object as Stripe.Subscription
-        let userId = sub.metadata?.user_id
+        const rawUserId = sub.metadata?.user_id
+        let userId = rawUserId && rawUserId.trim().length > 0 ? rawUserId : null
 
         if (!userId) {
           // Fallback: resolve via billingCustomer table
@@ -307,13 +329,8 @@ export const stripeProvider: BillingProvider = {
           }
         }
 
-        if (userId) {
-          await upsertSubscription(userId, sub)
-        } else {
-          console.warn(
-            `[stripe] ${event.type} could not resolve userId for sub ${sub.id}`,
-          )
-        }
+        // Always upsert - for guests, userId will be null and we track by subscriptionId
+        await upsertSubscription(userId, null, sub)
         break
       }
 

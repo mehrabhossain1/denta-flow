@@ -1,10 +1,9 @@
 "use client"
 
-import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
+import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { useOptimizedImageSrc } from '@/hooks/useOptimizedImageSrc'
 
 function Avatar({
   className,
@@ -24,21 +23,12 @@ function Avatar({
 
 function AvatarImage({
   className,
-  src,
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
-  // Automatically optimize avatar images
-  // Avatar images are typically small (200px max in most cases)
-  const optimizedSrc = useOptimizedImageSrc(src, {
-    width: 400, // 2x for retina displays
-    quality: 85,
-  })
-
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
       className={cn("aspect-square size-full object-cover", className)}
-      src={optimizedSrc}
       {...props}
     />
   )
@@ -60,4 +50,5 @@ function AvatarFallback({
   )
 }
 
-export { Avatar, AvatarImage, AvatarFallback }
+export { Avatar, AvatarFallback, AvatarImage }
+

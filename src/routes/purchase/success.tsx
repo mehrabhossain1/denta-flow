@@ -112,7 +112,7 @@ function PurchaseSuccess() {
             </CardTitle>
             <CardDescription>
               {isPaid
-                ? 'Your order has been confirmed and you now have access to Better-Starter.'
+                ? 'Your order has been confirmed and you now have access to BetterStarter.'
                 : 'Please wait while we confirm your payment.'}
             </CardDescription>
           </CardHeader>

@@ -7,10 +7,10 @@ const FAQ_ITEMS = [
   {
     question: 'What exactly do I get?',
     answer: `
-        Better-Starter is available as a one-time purchase with lifetime access to the GitHub repository containing a Full-Stack, AI-Ready, TypeScript-based starter boilerplate.
+        BetterStarter is available as a one-time purchase with lifetime access to the GitHub repository containing a Full-Stack, AI-Ready, TypeScript-based starter boilerplate.
         
         - GitHub code Access with lifetime access to make unlimited projects
-        - Public documentation on how to use Better-Starter
+        - Public documentation on how to use BetterStarter
       `,
   },
   {
@@ -25,7 +25,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'Which database does it support?',
-    answer: `Better-Starter is set up with Drizzle ORM and PostgreSQL.
+    answer: `BetterStarter is set up with Drizzle ORM and PostgreSQL.
       
       You can host your PostgreSQL DB at Supabase, Neon, Vercel DB, Cloud, or your own server.
       
@@ -41,12 +41,12 @@ const FAQ_ITEMS = [
   {
     question: 'Can I use it for multiple projects?',
     answer:
-      'Yes! Your license allows you to use Better-Starter for unlimited projects. You can even use it as a starting point for clients or products you build.',
+      'Yes! Your license allows you to use BetterStarter for unlimited projects. You can even use it as a starting point for clients or products you build.',
   },
   {
     question: 'How often is it updated?',
     answer:
-      'Better-Starter is actively maintained and updated regularly. Your purchase includes lifetime updates, so you always have access to the latest versions and features.',
+      'BetterStarter is actively maintained and updated regularly. Your purchase includes lifetime updates, so you always have access to the latest versions and features.',
   },
   {
     question: 'Is there support included?',
@@ -54,21 +54,21 @@ const FAQ_ITEMS = [
   },
   {
     question: 'Can I get a refund?',
-    answer: `Once you get access to the GitHub repo, Better-Starter is yours forever and it cannot be refunded.
+    answer: `Once you get access to the GitHub repo, BetterStarter is yours forever and it cannot be refunded.
       `,
   },
   {
     question: 'Where do I host my app?',
     answer: `
-      Anywhere you like. Better-Starter is hosting agnostic. Better-Starter is set up for Netlify, however, you can host on Vercel, Cloudflare, cloud, or your own server.
+      Anywhere you like. BetterStarter is hosting agnostic and can be hosted on Vercel, Cloudflare, AWS, or your own server.
       `,
   },
   {
     question: 'Can I vibe code with Cursor, Copilot, etc.?',
     answer: `
-      Yes! Better-Starter works with any coding editor, any vibe coding tool - Cursor, VS Code, IntelliJ, Antigravity, Kiro, Claude Code, etc.
+      Yes! BetterStarter works with any coding editor, any vibe coding tool - Cursor, VS Code, IntelliJ, Antigravity, Kiro, Claude Code, etc.
 
-      Better-Starter has special instructions for vibe-coding tools built-in to guide them for best output.
+      BetterStarter has special instructions for vibe-coding tools built-in to guide them for best output.
       `,
   },
   {
@@ -79,7 +79,7 @@ const FAQ_ITEMS = [
 
       Vibe coding is great (I use it myself), however, you need a solid starting point.
 
-      With Better-Starter you get
+      With BetterStarter you get
       - A good starting point (no blank slate)
       - Skip days of prompting to get it right
       - Skip troubleshooting bugs AI created
@@ -89,7 +89,7 @@ const FAQ_ITEMS = [
       - Skip vendor-lock
       - Skip over-engineered bloated code
       
-      Once you have a good starting point with Better-Starter, your startup has a solid foundation for growth and acceleration with AI and vibe coding.
+      Once you have a good starting point with BetterStarter, your startup has a solid foundation for growth and acceleration with AI and vibe coding.
       `,
   },
 ]

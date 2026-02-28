@@ -1,8 +1,9 @@
 // vite.config.ts
-import netlify from '@netlify/vite-plugin-tanstack-start'
+import contentCollections from '@content-collections/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
+import { nitro } from 'nitro/vite'
 import { defineConfig } from 'vite'
 import tsConfigPaths from 'vite-tsconfig-paths'
 
@@ -38,12 +39,10 @@ export default defineConfig({
     },
   },
   plugins: [
+    contentCollections(),
     tsConfigPaths(),
     tanstackStart(),
-    netlify({
-      // Configure Netlify to import Sentry instrumentation
-      nodeOptions: '--import ./instrument-server.mjs',
-    }),
+    nitro(),
     viteReact(),
     tailwindcss(),
   ],

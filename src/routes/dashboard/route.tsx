@@ -154,12 +154,9 @@ function Dashboard() {
                   {ent.grantedAt && (
                     <div className="text-sm text-muted-foreground">
                       Purchased: {new Date(ent.grantedAt).toLocaleDateString()}
-                      <p>
-                        Email aziz@better-starter.com for instant access to the
-                        Better-Starter github repo
-                      </p>
                     </div>
                   )}
+                  <div className="mt-3"></div>
                 </div>
               ))}
             </div>

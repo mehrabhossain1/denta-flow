@@ -6,7 +6,6 @@ import { Toaster } from '@/components/ui/sonner'
 import { Providers } from '@/providers'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import appCss from '@/styles/app.css?url'
-import * as Sentry from '@sentry/tanstackstart-react'
 import {
   createRootRoute,
   HeadContent,
@@ -63,26 +62,13 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <Sentry.ErrorBoundary
-        fallback={({ error }) => (
-          <div className="flex min-h-screen items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold">Something went wrong</h1>
-              <p className="mt-2 text-muted-foreground">
-                {error?.message || 'An unexpected error occurred'}
-              </p>
-            </div>
-          </div>
-        )}
-      >
-        <Providers>
-          <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-            <NavigationProgress />
-            <Outlet />
-            <Toaster />
-          </ThemeProvider>
-        </Providers>
-      </Sentry.ErrorBoundary>
+      <Providers>
+        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+          <NavigationProgress />
+          <Outlet />
+          <Toaster />
+        </ThemeProvider>
+      </Providers>
     </RootDocument>
   )
 }

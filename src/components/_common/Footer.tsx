@@ -1,5 +1,5 @@
 import { AUTH_ROUTES } from '@/constants/auth'
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 import config from '../../appConfig'
 import BuiltWithBadge from './BuiltWithBadge'
 import Logo from './Logo'
@@ -20,6 +20,14 @@ const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
   {
     label: 'Company',
     children: [
+      {
+        label: 'Blog',
+        to: '/blog',
+      },
+      {
+        label: 'Docs',
+        to: '/docs',
+      },
       {
         label: 'Terms',
         to: '/legal/terms',
@@ -42,10 +50,15 @@ const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
   },
 ]
 const Footer = () => {
+  const routerState = useRouterState()
+  const isFullWidth = routerState.location.pathname.startsWith('/docs')
+
   return (
     <footer className="relative border-t border-border/50">
       <BuiltWithBadge />
-      <div className="mx-auto max-w-7xl px-2 sm:px-8  py-12">
+      <div
+        className={`mx-auto ${isFullWidth ? 'w-full' : 'max-w-7xl'} px-2 sm:px-8 py-12`}
+      >
         <div className="flex flex-col flex-wrap gap-8 md:flex-row md:flex-nowrap lg:items-start">
           <div className="max-w-64 shrink-0 md:mx-0 md:text-left">
             <Logo shouldLink={false} />

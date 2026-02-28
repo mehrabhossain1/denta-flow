@@ -1,18 +1,16 @@
 # Better-Starter
 
-## Features to create
-- [x] Fix: Plunk `from`
-- [x] Fix: Tanstack Updates
-- [ ] Actual Github repo + tested
-- [ ] Feat: Auto invite to github
-- [ ] Feat: Performance
-- [x] Marketing: More section - husky, lint, format, caching, performance + sentry
-- [x] Tech: Header with CTA + mobile view logo squished
-- [x] Stripe Payment + Dashboard + webhooks
-- [ ] Documentation
-- [ ] Feat: Blog + Sitemap
-- [ ] Feat: More components
-- [ ] Landing: Social proof + CTA
+# Todo Onboarding
+
+# Todo Upgrade
+- [ ] update start, better-auth, better-auth-ui
+- [ ] sitemap.xml should auto detect
+- [ ] Landing Page Template
+- [ ] PurchaseButton info .billing.js file
+
+# Quick start
+1. pnpm i
+2. pnpm dev
 
 # First time setup
 1. DB create db, `pnpm db:pull` && `pnpm db:push`

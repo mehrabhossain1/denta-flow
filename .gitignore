@@ -2,9 +2,13 @@ node_modules
 dist
 .env
 .DS_Store
+.content-collections
 
-.netlify/*
 .tanstack/*
 .nitro/*
+.output/*
 
-.env*
+.env
+.env.local
+.env.development
+.env.production

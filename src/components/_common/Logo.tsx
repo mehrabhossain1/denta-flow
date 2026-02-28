@@ -13,7 +13,7 @@ type PropTypes = {
 }
 
 const Logo = ({
-  to = 'https://better-starter.com',
+  to = '/',
   shouldLink = true,
   isIconOnly,
   size = 'md',

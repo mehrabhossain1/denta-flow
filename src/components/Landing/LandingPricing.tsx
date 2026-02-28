@@ -14,8 +14,8 @@ const PRICING_PLANS = [
   {
     name: 'Core',
     description: 'Everything you need to launch your startup',
-    originalPrice: 149,
-    discountedPrice: 49,
+    originalPrice: 199,
+    discountedPrice: 99,
     features: [
       'Full source code access',
       'PostgreSQL + Drizzle ORM setup',
@@ -28,7 +28,7 @@ const PRICING_PLANS = [
       'Complete documentation & videos',
       'Lifetime updates',
     ],
-    cta: 'Get Better-Starter',
+    cta: 'Get BetterStarter',
     highlight: true,
   },
 ]
@@ -102,7 +102,7 @@ export function PricingSection() {
                     mode="payment"
                     priceId={STRIPE_CONFIG.PRODUCTS.CORE.prices.ONE_TIME}
                     variant={plan.highlight ? 'default' : 'outline'}
-                    className="w-full"
+                    className="px-8 py-3 text-base"
                   >
                     {plan.cta}
                   </PurchaseButton>

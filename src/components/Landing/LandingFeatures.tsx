@@ -12,7 +12,7 @@ import {
   Shield,
   Zap,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SiDrizzle, SiShadcnui, SiTailwindcss } from 'react-icons/si'
 import { SectionHeader } from '../_common/SectionHeader'
 import { Badge } from '../ui/badge'
@@ -40,7 +40,7 @@ const FEATURES = [
     icon: Shield,
     tech: 'better-auth',
     timeSaved: '~2 hours on auth + sessions',
-    better: 'Own your auth. No paying vendors',
+    better: 'Open source. Self-hostable. No vendor lock-in',
     description:
       '34+ integrations supported including Google, GitHub, Twitter, and more. Email OTP and session management control built in.',
     highlights: [
@@ -71,7 +71,7 @@ const FEATURES = [
     icon: Mail,
     tech: 'Plunk',
     timeSaved: '~3 hours on email setup',
-    better: 'Open-source & affordable. No paying vendor-lock',
+    better: 'Open source. Self-hostable. No vendor lock-in',
     description:
       'Send transactional and marketing emails with ease. Templates, automation, and analytics included. Reliable delivery out of the box.',
     highlights: [
@@ -86,7 +86,7 @@ const FEATURES = [
     title: 'SEO / AEO',
     icon: Search,
     tech: 'Meta tags',
-    timeSaved: '~3 hours on SEO & AEO wiring',
+    timeSaved: '~5 hours on SEO & AEO wiring',
     better: 'Title, Meta tags, OG, Twitter',
     description:
       'Complete SEO & AEO setup with meta tags, Open Graph, Twitter Cards, and sitemap generation. Optimized for search engines out of the box.',
@@ -94,7 +94,7 @@ const FEATURES = [
       'Meta tags configured',
       'Open Graph support',
       'Twitter Cards',
-      'Sitemap generation (coming soon)',
+      'Sitemap.xml generation',
     ],
   },
   {
@@ -308,47 +308,99 @@ const FeatureContent = ({
 }
 
 export function FeaturesSection() {
-  const [activeTab, setActiveTab] = useState(FEATURES[0].id)
-  const activeFeature = FEATURES.find((f) => f.id === activeTab) || FEATURES[0]
+  const [activeSection, setActiveSection] = useState(FEATURES[0].id)
+  const sectionRefs = useRef<Map<string, HTMLElement>>(new Map())
+  const observerRef = useRef<IntersectionObserver | null>(null)
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('data-feature-id')
+            if (id) setActiveSection(id)
+          }
+        })
+      },
+      {
+        rootMargin: '-20% 0% -60% 0%',
+        threshold: 0.1,
+      },
+    )
+
+    sectionRefs.current.forEach((section) => {
+      observerRef.current?.observe(section)
+    })
+
+    return () => {
+      observerRef.current?.disconnect()
+    }
+  }, [])
+
+  const scrollToFeature = (id: string) => {
+    const element = sectionRefs.current.get(id)
+    if (element) {
+      const offset = 100
+      const top = element.getBoundingClientRect().top + window.scrollY - offset
+      window.scrollTo({ top, behavior: 'smooth' })
+    }
+  }
 
   return (
     <section id="features" className="py-20 sm:py-32">
-      <div className="mx-auto max-w-5xl px-6 sm:px-8">
+      <div className="mx-auto max-w-7xl px-6 sm:px-8">
         <SectionHeader
           title={
             <span className="relative inline-flex flex-wrap items-center justify-center">
               Everything you need to launch
-              <TimeSavedBadge text="Save 33h" size="base" />
+              <TimeSavedBadge text="Save 35h" size="base" />
             </span>
           }
-          description="No more juggling 10 different services. Better-starter has everything built in and ready to go."
+          description="No more juggling 10 different services. BetterStarter has everything built in and ready to go."
         />
 
-        {/* Desktop: Tabs */}
-        <div className="hidden lg:block">
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {FEATURES.map((feature) => {
-              const Icon = feature.icon
-              return (
-                <button
-                  key={feature.id}
-                  type="button"
-                  onClick={() => setActiveTab(feature.id)}
-                  className={cn(
-                    STYLES.tabBase,
-                    activeTab === feature.id
-                      ? STYLES.tabActive
-                      : STYLES.tabInactive,
-                  )}
-                >
-                  <Icon className="w-4 h-4" />
-                  {feature.title}
-                </button>
-              )
-            })}
+        {/* Desktop: Sidebar + Scroll Content */}
+        <div className="hidden lg:flex gap-8 items-start">
+          {/* Left Sidebar: Feature Navigation */}
+          <div className="w-64 flex-shrink-0 sticky top-24">
+            <nav className="space-y-2">
+              {FEATURES.map((feature) => {
+                const Icon = feature.icon
+                return (
+                  <button
+                    key={feature.id}
+                    type="button"
+                    onClick={() => scrollToFeature(feature.id)}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-left',
+                      activeSection === feature.id
+                        ? 'bg-foreground text-background shadow-sm'
+                        : 'bg-muted/30 hover:bg-muted text-foreground/70 hover:text-foreground',
+                    )}
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="leading-tight">{feature.title}</span>
+                  </button>
+                )
+              })}
+            </nav>
           </div>
-          <div className={STYLES.card}>
-            <FeatureContent feature={activeFeature} />
+
+          {/* Right Content: Scrollable Feature Cards */}
+          <div className="flex-1 space-y-12">
+            {FEATURES.map((feature) => (
+              <div
+                key={feature.id}
+                data-feature-id={feature.id}
+                ref={(el) => {
+                  if (el) sectionRefs.current.set(feature.id, el)
+                  else sectionRefs.current.delete(feature.id)
+                }}
+                className={STYLES.card}
+              >
+                <FeatureContent feature={feature} />
+              </div>
+            ))}
           </div>
         </div>
 

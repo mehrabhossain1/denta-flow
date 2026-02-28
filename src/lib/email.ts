@@ -1,8 +1,9 @@
-const PLUNK_SECRET_API_KEY = process.env.PLUNK_SECRET_API_KEY || ''
+import { env } from '@/env'
+
+const PLUNK_SECRET_API_KEY = env.PLUNK_SECRET_API_KEY
 const PLUNK_BASE_URL = 'https://next-api.useplunk.com'
 const PLUNK_API_URL = `${PLUNK_BASE_URL}/v1/send`
-const TRANSACTIONAL_EMAIL =
-  process.env.TRANSACTIONAL_EMAIL || 'noreply@my-awesome-site.com'
+const TRANSACTIONAL_EMAIL = env.TRANSACTIONAL_EMAIL
 
 export async function sendOTPEmail({
   email,

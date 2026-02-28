@@ -1,16 +1,14 @@
 import { OTP_CONFIG } from '@/constants/auth'
 import { db } from '@/db'
 import * as authSchema from '@/db/schema/auth'
+import { env } from '@/env'
 import { sendOTPEmail } from '@/lib/email'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { emailOTP } from 'better-auth/plugins'
-import { reactStartCookies } from 'better-auth/react-start'
+import { tanstackStartCookies } from 'better-auth/tanstack-start'
 
-if (
-  !import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-  !process.env.GOOGLE_CLIENT_SECRET
-) {
+if (!env.VITE_GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
   console.warn(
     'Google OAuth credentials not configured. Google sign-in will not work.',
   )
@@ -31,8 +29,8 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      clientId: env.VITE_GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
   plugins: [
@@ -44,6 +42,6 @@ export const auth = betterAuth({
       otpLength: OTP_CONFIG.LENGTH,
       expiresIn: OTP_CONFIG.EXPIRES_IN_SECONDS,
     }),
-    reactStartCookies(), // Must be last plugin in the array
+    tanstackStartCookies(), // Must be last plugin in the array
   ],
 })

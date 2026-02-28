@@ -1,26 +1,29 @@
-export interface ConfigProps {
+interface ConfigProps {
   appName: string
   url: string
   appDescription: string
   supportEmail?: string
   features: {
-    imageOptimization: {
+    blog: {
       enabled: boolean
+      title: string
+      description: string
     }
   }
 }
 
-const config: ConfigProps = {
-  appName: 'Better-Starter',
-  url: 'better-starter.com',
+export default {
+  appName: 'BetterStarter',
+  url: 'betterstarter.dev',
   appDescription:
     'Better Starter - Start Your Business Right. Launch fast, scale quickly, and be ready for the future.',
-  supportEmail: 'support@better-starter.com',
+  supportEmail: 'support@betterstarter.dev',
   features: {
-    imageOptimization: {
-      enabled: true, // Set to false to disable Netlify Image CDN
+    blog: {
+      enabled: true,
+      title: 'BetterStarter Blog',
+      description:
+        'Articles about BetterStarter, and launching your SaaS quickly and correctly.',
     },
   },
-}
-
-export default config
+} as ConfigProps

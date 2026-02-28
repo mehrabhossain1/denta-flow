@@ -11,17 +11,20 @@ export const BILLING_CONFIG = {
   CANCEL_PATH: '/#pricing',
 } as const
 
+import { env } from '@/env'
+
 /**
  * Stripe-specific configuration.
  * Prices are nested under their parent product.
  */
 export const STRIPE_CONFIG = {
+  PROMOTION_CODE_ID: env.VITE_STRIPE_PROMOTION_CODE_ID,
   PRODUCTS: {
     CORE: {
-      id: 'prod_TrJsIQngzzbNJT',
-      name: 'Better-Starter Core',
+      id: env.VITE_STRIPE_PRODUCT_CORE_ID,
+      name: 'BetterStarter Core',
       prices: {
-        ONE_TIME: 'price_1StbERELFHFYjexwte8HtNeB',
+        ONE_TIME: env.VITE_STRIPE_PRICE_CORE_ONE_TIME_ID,
       },
     },
   },

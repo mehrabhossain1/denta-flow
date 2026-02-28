@@ -7,7 +7,6 @@
 
 /* 
  * - Open Runde: Primary font (self-hosted for control)
- * - Inter: Secondary/fallback font (npm package for convenience)
  * - font-display: swap for instant text visibility
  */
 
@@ -36,13 +35,9 @@
   font-display: swap;
 }
 
-/* Inter Font Family - From @fontsource/inter package */
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/600.css';
 
 @theme inline {
-  --font-sans: 'Open Runde', Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-sans: 'Open Runde', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -194,6 +189,193 @@
   button.h-8{
     @apply !h-7
   }
+
+  /* Blog content heading anchors */
+  .prose h1[id],
+  .prose h2[id],
+  .prose h3[id],
+  .prose h4[id],
+  .prose h5[id],
+  .prose h6[id] {
+    position: relative;
+  }
+
+  .prose h1[id]::after,
+  .prose h2[id]::after,
+  .prose h3[id]::after,
+  .prose h4[id]::after,
+  .prose h5[id]::after,
+  .prose h6[id]::after {
+    content: '#';
+    margin-left: 10px;
+    opacity: 0;
+    transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--color-muted-foreground);
+  }
+
+  .prose h1[id]:hover::after,
+  .prose h2[id]:hover::after,
+  .prose h3[id]:hover::after,
+  .prose h4[id]:hover::after,
+  .prose h5[id]:hover::after,
+  .prose h6[id]:hover::after {
+    opacity: 1;
+  }
+
+  .prose a[href^="#"] {
+    text-decoration: none !important;
+  }
+
+  /* Code block base styles */
+  .prose pre {
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+
+  .prose :not(pre) > code {
+    border-radius: 0.25rem;
+    padding: 0.15em 0.4em;
+    font-size: 0.875em;
+  }
+
+  .prose pre code.hljs {
+    background: transparent;
+    padding: 0;
+  }
+}
+
+/* ---- Syntax highlighting: Light mode (One Light inspired) ---- */
+.prose .hljs {
+  color: #FFF;
+}
+
+.prose .hljs-comment,
+.prose .hljs-quote {
+  color: #a0a1a7;
+  font-style: italic;
+}
+
+.prose .hljs-keyword,
+.prose .hljs-selector-tag,
+.prose .hljs-meta .hljs-keyword {
+  color: #a626a4;
+}
+
+.prose .hljs-string,
+.prose .hljs-attr {
+  color: #50a14f;
+}
+
+.prose .hljs-number,
+.prose .hljs-literal {
+  color: #986801;
+}
+
+.prose .hljs-title,
+.prose .hljs-section,
+.prose .hljs-built_in {
+  color: #4078f2;
+}
+
+.prose .hljs-name,
+.prose .hljs-tag {
+  color: #e45649;
+}
+
+.prose .hljs-variable,
+.prose .hljs-template-variable {
+  color: #e45649;
+}
+
+.prose .hljs-type,
+.prose .hljs-selector-class {
+  color: #c18401;
+}
+
+.prose .hljs-params {
+  color: #9c9fa8;
+}
+
+.prose .hljs-deletion {
+  color: #e45649;
+  background: #ffeef0;
+}
+
+.prose .hljs-addition {
+  color: #50a14f;
+  background: #e6ffec;
+}
+
+/* ---- Syntax highlighting: Dark mode (GitHub Dark Dimmed) ---- */
+.dark .prose .hljs {
+  color: oklch(0.85 0 0);
+  background: oklch(0.18 0.005 260);
+}
+
+.dark .prose .hljs-comment,
+.dark .prose .hljs-quote {
+  color: oklch(0.58 0 0);
+  font-style: italic;
+}
+
+.dark .prose .hljs-keyword,
+.dark .prose .hljs-selector-tag,
+.dark .prose .hljs-meta .hljs-keyword {
+  color: oklch(0.72 0.14 340);
+}
+
+.dark .prose .hljs-string,
+.dark .prose .hljs-attr,
+.dark .prose .hljs-addition {
+  color: oklch(0.75 0.12 170);
+}
+
+.dark .prose .hljs-number,
+.dark .prose .hljs-literal {
+  color: oklch(0.78 0.12 80);
+}
+
+.dark .prose .hljs-title,
+.dark .prose .hljs-section,
+.dark .prose .hljs-built_in {
+  color: oklch(0.78 0.14 260);
+}
+
+.dark .prose .hljs-name,
+.dark .prose .hljs-tag {
+  color: oklch(0.72 0.12 170);
+}
+
+.dark .prose .hljs-variable,
+.dark .prose .hljs-template-variable {
+  color: oklch(0.78 0.15 50);
+}
+
+.dark .prose .hljs-type,
+.dark .prose .hljs-selector-class {
+  color: oklch(0.78 0.12 80);
+}
+
+.dark .prose .hljs-deletion {
+  color: oklch(0.72 0.18 25);
+  background: oklch(0.25 0.06 25);
+}
+
+.dark .prose .hljs-addition {
+  background: oklch(0.25 0.06 145);
+}
+
+/* Dark mode code block surface */
+.dark .prose pre {
+  background: oklch(0.18 0.005 260);
+  border-color: oklch(1 0 0 / 8%);
+}
+
+.dark .prose :not(pre) > code {
+  background: oklch(0.25 0.005 260);
+  color: oklch(0.85 0.1 340);
 }
 
 @layer base {
