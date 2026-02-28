@@ -185,8 +185,6 @@ See `src/db/schema/` and `src/hooks/useProducts.ts` for reference implementation
 
 ## External Services
 
-- **Sentry**: Error tracking (configured in `src/lib/sentry.ts`)
-- **UploadThing**: Image uploads (see `src/lib/uploadthing.ts`)
 - **Supabase**: Hosts Postgres database for all data
 
 ## Testing Strategy
