@@ -166,6 +166,10 @@
 }
 
 
+.prose {
+  --tw-prose-pre-bg: #f9f9f9;
+}
+
 /* CUSTOM-OPEN-USER */
 @layer components {
   .link {
@@ -230,6 +234,7 @@
   .prose pre {
     border-radius: 0.5rem;
     border: 1px solid var(--border);
+    background: var(--muted);
     font-size: 0.875rem;
     line-height: 1.7;
   }
@@ -237,6 +242,8 @@
   .prose :not(pre) > code {
     border-radius: 0.25rem;
     padding: 0.15em 0.4em;
+    background: var(--muted);
+    color: var(--foreground);
     font-size: 0.875em;
   }
 
@@ -248,7 +255,7 @@
 
 /* ---- Syntax highlighting: Light mode (One Light inspired) ---- */
 .prose .hljs {
-  color: #FFF;
+  color: var(--foreground);
 }
 
 .prose .hljs-comment,

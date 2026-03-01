@@ -108,7 +108,7 @@ pnpm db:push
 
 ## Roadmap
 
-- [ ] Onboarding flow
+- [x] Onboarding flow
 - [ ] Update TanStack Start, better-auth, better-auth-ui
 - [ ] Auto-detect routes in sitemap.xml
 - [ ] Landing page template
