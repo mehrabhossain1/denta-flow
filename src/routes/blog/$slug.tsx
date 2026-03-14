@@ -14,13 +14,7 @@ const loader = async ({
 }: {
   params: { slug: string }
 }): Promise<{ post: BlogPost & { isUnpublished: boolean } }> => {
-  const post = await (
-    fetchBlogPost as unknown as (args: {
-      data: { slug: string }
-    }) => Promise<(BlogPost & { isUnpublished: boolean }) | null>
-  )({
-    data: { slug: params.slug },
-  })
+  const post = await fetchBlogPost({ data: { slug: params.slug } })
 
   if (!post) {
     throw notFound()
