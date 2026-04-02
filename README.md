@@ -10,6 +10,12 @@
     <img src="https://img.shields.io/badge/Postgres-Drizzle_ORM-4169E1?style=flat-square&logo=postgresql" alt="Postgres + Drizzle" />
     <img src="https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=flat-square&logo=tailwindcss" alt="Tailwind CSS v4" />
   </p>
+
+  <p>
+    <a href="https://betterstarter.dev/docs">
+      <img src="https://img.shields.io/badge/📖_Read_the_Docs-betterstarter.dev%2Fdocs-000000?style=for-the-badge" alt="Read the Docs" />
+    </a>
+  </p>
 </div>
 
 ---
@@ -34,7 +40,7 @@ Authentication, billing, database, email, file uploads, a blog, and a polished l
 | Email | [Plunk](https://useplunk.com) |
 | Blog | Content Collections (Markdown) |
 | Linting | [Biome](https://biomejs.dev) |
-| Deployment | Netlify (SSR) |
+| Deployment | Vercel, Netlify (SSR) |
 
 ---
 
@@ -51,7 +57,7 @@ pnpm dev
 
 ### 1. Database
 
-Create a Postgres database (e.g. on Supabase), then:
+Create a Postgres database (e.g. on Neon, Supabase, any postgres), then:
 
 ```bash
 pnpm db:pull   # pull existing schema
@@ -106,10 +112,20 @@ pnpm db:push
 
 ---
 
+## Features
+- ✅ Deploy in < 5 mins
+- ✅ Authentication (Google, Passkeys, 34+ mechanisms)
+- ✅ Fast DB with Drizzle ORM (Neom, Supabase, any Postgres host)
+- ✅ Email with Plunk (Cheap and open-source)
+- ✅ Payment module (supports one-time & subscription)
+- ✅ Beautiful SEO + AEO compatible Blog
+- ✅ Deploy anywhere (Vercel, Netlify, cloudflare)
+
 ## Roadmap
 
-- [x] Onboarding flow
-- [ ] Update TanStack Start, better-auth, better-auth-ui
-- [ ] Auto-detect routes in sitemap.xml
-- [ ] Landing page template
-- [ ] PurchaseButton billing config helper
+- [x] Admin dashboard
+- [ ] Make generic landing page blocks
+- [ ] Agent SDK support (With mastra ai)
+- [ ] Multi-tenancy (Add user, roles, ban user, make organizations)
+- [ ] Auto OG image generation
+- [ ] Migrate Docs with module with Fumadocs
