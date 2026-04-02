@@ -49,9 +49,17 @@ const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
     ],
   },
 ]
-const Footer = () => {
+type FooterVariant = 'default' | 'fullWidth'
+
+type PropTypes = {
+  variant?: FooterVariant
+}
+
+const Footer = ({ variant }: PropTypes) => {
   const routerState = useRouterState()
-  const isFullWidth = routerState.location.pathname.startsWith('/docs')
+  const isFullWidth =
+    variant === 'fullWidth' ||
+    (variant === undefined && routerState.location.pathname.startsWith('/docs'))
 
   return (
     <footer className="relative border-t border-border/50">
@@ -105,3 +113,29 @@ const Footer = () => {
 }
 
 export default Footer
+
+export function FooterSlim() {
+  return (
+    <footer className="border-t border-border/50 px-4 py-3 lg:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+        <span>
+          © {new Date().getFullYear()} {config.appName}. All rights reserved.
+        </span>
+        <div className="flex items-center gap-4">
+          <Link
+            to="/legal/terms"
+            className="hover:text-foreground transition-colors"
+          >
+            Terms
+          </Link>
+          <Link
+            to="/legal/privacy"
+            className="hover:text-foreground transition-colors"
+          >
+            Privacy
+          </Link>
+        </div>
+      </div>
+    </footer>
+  )
+}

@@ -35,7 +35,6 @@
   font-display: swap;
 }
 
-
 @theme inline {
   --font-sans: 'Open Runde', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   --radius-sm: calc(var(--radius) - 4px);
@@ -164,7 +163,6 @@
 .typing-caret {
   animation: caret-blink 1s step-end infinite;
 }
-
 
 .prose {
   --tw-prose-pre-bg: #f9f9f9;
@@ -481,9 +479,45 @@
   }
 }
 
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
 .bg-hero {
   @apply
     bg-[radial-gradient(rgb(68,76,247)_0.5px,rgb(254,254,255)_0.5px)]
     dark:bg-[radial-gradient(rgb(62,62,176)_0.5px,rgb(11_11_12)_0.5px)]
     bg-size-[9px_9px];
+}
+
+.card-bg:before, .card-bg:after{
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  top: 70%;
+  border-radius: 50%;
+  transform: translateY(-200px) rotate(-30deg);
+  filter: blur(150px);
+  opacity: .3;
+  z-index: -1;
+}
+
+.card-bg:before{
+  background-color: #ee9261;
+  left: 20%;
+}
+
+.card-bg:after{
+  background-color: #c461ee;
+  right: 20%;
 }

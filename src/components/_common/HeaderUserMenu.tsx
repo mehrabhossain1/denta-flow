@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { UserAvatar } from '@/components/_common/UserAvatar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -7,8 +7,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { signOut } from '@/lib/auth/client'
-import { Link, useRouter } from '@tanstack/react-router'
+import { useLogout } from '@/hooks/useLogout'
+import { Link } from '@tanstack/react-router'
 
 interface HeaderUserMenuProps {
   user: {
@@ -19,13 +19,7 @@ interface HeaderUserMenuProps {
 }
 
 export default function HeaderUserMenu({ user }: HeaderUserMenuProps) {
-  const router = useRouter()
-
-  const handleLogout = async () => {
-    await signOut()
-    // Force reload to clear all cached state
-    router.invalidate()
-  }
+  const logout = useLogout()
 
   return (
     <DropdownMenu>
@@ -35,14 +29,12 @@ export default function HeaderUserMenu({ user }: HeaderUserMenuProps) {
           size="icon"
           className="h-6 w-6 overflow-hidden rounded-full"
         >
-          <Avatar>
-            <AvatarImage src={user.image ?? ''} alt={user.name ?? ''} />
-            <AvatarFallback>
-              {user.name
-                ? user.name.charAt(0).toUpperCase()
-                : user.email?.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            name={user.name}
+            email={user.email}
+            image={user.image}
+            className="h-6 w-6"
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -50,7 +42,7 @@ export default function HeaderUserMenu({ user }: HeaderUserMenuProps) {
           <DropdownMenuItem>Settings</DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+        <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

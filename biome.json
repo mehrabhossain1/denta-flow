@@ -10,7 +10,7 @@
     "includes": [
       "src/**/*",
       "!src/components/ui",
-      "!src/hooks/use-mobile.ts",
+      "!src/hooks/useMobile.ts",
       "!src/styles",
       "!migrations",
       "!src/routeTree.gen.ts"

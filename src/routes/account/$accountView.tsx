@@ -1,4 +1,3 @@
-import { PageHeader } from '@/components/_common/PageHeader'
 import { AUTH_ROUTES } from '@/constants/auth'
 import { useSession } from '@/lib/auth/client'
 import { generatePageSEO } from '@/lib/seo'
@@ -43,27 +42,23 @@ function Settings() {
 
   if (!session && !isPending) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Redirecting to login...</p>
+      <div className="px-4 py-8 lg:px-6">
+        <p className="text-muted-foreground">Redirecting to login...</p>
       </div>
     )
   }
 
   if (isPending) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
+      <div className="px-4 py-8 lg:px-6">
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     )
   }
 
   return (
-    <>
-      <PageHeader
-        title="Account Settings"
-        description="Manage your account preferences and personal information"
-      />
+    <div className="px-4 py-4 lg:px-6 lg:py-6">
       <AccountView pathname={accountView} />
-    </>
+    </div>
   )
 }

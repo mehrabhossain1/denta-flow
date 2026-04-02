@@ -55,6 +55,13 @@ function generateSitemap() {
     priority: 0.3,
   })
 
+  // Docs
+  urls.push({
+    loc: `${siteUrl}/docs`,
+    changefreq: 'weekly',
+    priority: 0.8,
+  })
+
   // Blog posts
   const posts = getPublishedPosts()
   for (const post of posts) {

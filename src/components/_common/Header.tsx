@@ -2,6 +2,7 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import type { MouseEvent } from 'react'
 import HeaderAuth from './HeaderAuth'
 import Logo from './Logo'
+import { ThemeToggle } from './ThemeToggle'
 
 const HOME_PATH = '/'
 
@@ -38,10 +39,18 @@ const handleNavClick = (
   scrollToSection(sectionId)
 }
 
-const Header = () => {
+type HeaderVariant = 'default' | 'fullWidth'
+
+type PropTypes = {
+  variant?: HeaderVariant
+}
+
+const Header = ({ variant }: PropTypes) => {
   const routerState = useRouterState()
   const isHomePage = routerState.location.pathname === HOME_PATH
-  const isFullWidth = routerState.location.pathname.startsWith('/docs')
+  const isFullWidth =
+    variant === 'fullWidth' ||
+    (variant === undefined && routerState.location.pathname.startsWith('/docs'))
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/40">
@@ -58,7 +67,7 @@ const Header = () => {
           {/* Center section - Navigation (only show on home page) */}
           {isHomePage && (
             <div className="flex-1 max-w-xl mx-auto">
-              <ul className="flex items-center justify-center gap-0 text-sm font-medium">
+              <ul className="flex items-center justify-center gap-0 text-xs font-medium">
                 {NAV_ITEMS.map((item) => (
                   <li key={item.sectionId}>
                     <Link
@@ -79,7 +88,8 @@ const Header = () => {
           {!isHomePage && <div className="flex-1" />}
 
           {/* Right section - User menu */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <HeaderAuth
               onNavigateToPricing={(event) =>
                 handleNavClick(event, SECTION_IDS.pricing)

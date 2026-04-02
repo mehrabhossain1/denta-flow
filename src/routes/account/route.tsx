@@ -1,4 +1,4 @@
-import { PageLayout } from '@/components/_common/PageLayout'
+import { AppShell } from '@/components/_common/AppShell'
 import { generatePageSEO } from '@/lib/seo'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
@@ -14,8 +14,8 @@ export const Route = createFileRoute('/account')({
 
 function RouteComponent() {
   return (
-    <PageLayout>
+    <AppShell title="Account">
       <Outlet />
-    </PageLayout>
+    </AppShell>
   )
 }

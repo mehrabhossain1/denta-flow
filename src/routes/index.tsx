@@ -1,23 +1,22 @@
 import config from '@/appConfig'
 import Footer from '@/components/_common/Footer'
 import Header from '@/components/_common/Header'
-import { LandingAIReady } from '@/components/Landing/LandingAIReady'
 import { LandingComparison } from '@/components/Landing/LandingComparison'
 import { LandingCreator } from '@/components/Landing/LandingCreator'
-import { CTASection } from '@/components/Landing/LandingCTA'
+import { LandingCTA } from '@/components/Landing/LandingCTA'
 import { FAQSection } from '@/components/Landing/LandingFAQ'
 import { FeaturesSection } from '@/components/Landing/LandingFeatures'
 import { LandingHero } from '@/components/Landing/LandingHero'
 import { PricingSection } from '@/components/Landing/LandingPricing'
-import { LandingTestimonials } from '@/components/Landing/LandingTestimonials'
+import { LandingQuickstart } from '@/components/Landing/LandingQuickstart'
 import { generateCompleteSEO } from '@/lib/seo'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
   head: () => ({
     meta: generateCompleteSEO({
-      title: `${config.appName} - Ship your SaaS in days, not months`,
-      description: `Build your SaaS in days with BetterStarter. Complete starter with TanStack Start, PostgreSQL, authentication, and 130+ hours of saved development time.`,
+      title: `${config.appName} - TanStack Start SaaS Starter Kit`,
+      description: `TanStack Start SaaS boilerplate built with Better-Auth, Drizzle, Stripe, Plunk, shadcn/ui, and more. Feature Admin, Blog, Docs, SEO/AEO, and more.`,
     }),
   }),
   component: RouteComponent,
@@ -27,16 +26,15 @@ function RouteComponent() {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="min-h-screen">
+      <main className="min-h-screen contain-paint">
         <LandingHero />
-        <LandingCreator />
+        <LandingQuickstart />
         <FeaturesSection />
-        <LandingAIReady />
         <LandingComparison />
-        <LandingTestimonials />
         <PricingSection />
+        <LandingCreator />
         <FAQSection />
-        <CTASection />
+        <LandingCTA />
       </main>
       <Footer />
     </div>

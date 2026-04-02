@@ -50,13 +50,11 @@ function RouteComponent() {
   const { authView } = Route.useParams()
   const isLoggedIn = useSession().data?.user
   const normalizedAuthView = authView.toLowerCase()
-  const paramsInValidForLoggedInUser = new Set(
+  const paramsInValidForLoggedInUser = new Set<string>(
     AUTH_ROUTES_INVALID_WHEN_LOGGED_IN,
   )
   const showIsLoggedInMessage =
-    paramsInValidForLoggedInUser.has(
-      normalizedAuthView as (typeof AUTH_ROUTES_INVALID_WHEN_LOGGED_IN)[number],
-    ) && isLoggedIn
+    paramsInValidForLoggedInUser.has(normalizedAuthView) && isLoggedIn
 
   useEffect(() => {
     if (showIsLoggedInMessage) {
@@ -67,7 +65,11 @@ function RouteComponent() {
   return (
     <main className="flex grow flex-col items-center justify-center gap-3 self-center p-4 md:p-6">
       <Logo size="xl" />
-      {showIsLoggedInMessage ? <AlreadyLoggedInCard /> : <AuthView />}
+      {showIsLoggedInMessage ? (
+        <AlreadyLoggedInCard />
+      ) : (
+        <AuthView pathname={normalizedAuthView} />
+      )}
     </main>
   )
 }

@@ -154,9 +154,10 @@ export function FAQSection() {
 
   return (
     // biome-ignore lint/correctness/useUniqueElementIds: Static landing page section IDs
-    <section id="faq" className="py-20 sm:py-32">
+    <section id="faq" className="py-10 sm:py-20">
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
         <SectionHeader
+          eyebrow="FAQ"
           title="Frequently asked questions"
           description={
             <span>
