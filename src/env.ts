@@ -7,7 +7,7 @@ export const env = createEnv({
     DATABASE_URL: z.url(),
     BETTER_AUTH_URL: z.url(),
     BETTER_AUTH_SECRET: z.string().min(1),
-    PLUNK_SECRET_API_KEY: z.string().min(1),
+    RESEND_API_KEY: z.string().min(1),
     TRANSACTIONAL_EMAIL: z.email(),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
     STRIPE_SECRET_KEY: z.string().min(1),

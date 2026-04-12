@@ -16,6 +16,7 @@ export function Providers({ children }: { children: ReactNode }) {
           social={{ providers: ['google'] }}
           authClient={authClient}
           emailOTP
+          redirectTo="/dashboard"
           navigate={(href) => router.navigate({ href })}
           replace={(href) => router.navigate({ href, replace: true })}
           Link={({ href, ...props }) => <Link to={href} {...props} />}

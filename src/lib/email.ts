@@ -1,9 +1,8 @@
 import { env } from '@/env'
+import { Resend } from 'resend'
 
-const PLUNK_SECRET_API_KEY = env.PLUNK_SECRET_API_KEY
-const PLUNK_BASE_URL = 'https://next-api.useplunk.com'
-const PLUNK_API_URL = `${PLUNK_BASE_URL}/v1/send`
-const TRANSACTIONAL_EMAIL = env.TRANSACTIONAL_EMAIL
+const resend = new Resend(env.RESEND_API_KEY)
+const FROM_EMAIL = env.TRANSACTIONAL_EMAIL
 
 export async function sendOTPEmail({
   email,
@@ -26,7 +25,7 @@ This code will expire in 5 minutes.
 
 If you didn't request this code, please ignore this email.`
 
-  if (!PLUNK_SECRET_API_KEY) {
+  if (!env.RESEND_API_KEY) {
     if (import.meta.env.DEV) {
       console.log(`[DEV] OTP for ${email}: ${otp}`)
     }
@@ -34,22 +33,15 @@ If you didn't request this code, please ignore this email.`
   }
 
   try {
-    const response = await fetch(PLUNK_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${PLUNK_SECRET_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: TRANSACTIONAL_EMAIL,
-        to: email,
-        subject: subjects[type],
-        body,
-      }),
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      subject: subjects[type],
+      text: body,
     })
 
-    if (!response.ok) {
-      console.error('Failed to send OTP email:', await response.text())
+    if (error) {
+      console.error('Failed to send OTP email:', error)
     }
   } catch (error) {
     console.error('Failed to send OTP email:', error)

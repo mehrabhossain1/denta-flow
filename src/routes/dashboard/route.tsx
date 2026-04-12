@@ -44,7 +44,7 @@ function DashboardLayout() {
       router.navigate({
         to: '/auth/$authView',
         params: { authView: AUTH_ROUTES.SIGN_IN },
-        search: { redirect: location.href },
+        search: { redirectTo: '/dashboard' },
       })
     }
   }, [session, isPending, router])
