@@ -12,6 +12,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string().min(1),
     STRIPE_SECRET_KEY: z.string().min(1),
     STRIPE_WEBHOOK_SECRET: z.string().min(1),
+    GEMINI_API_KEY: z.string().min(1),
   },
   clientPrefix: 'VITE_',
   client: {
@@ -23,6 +24,7 @@ export const env = createEnv({
   runtimeEnv: {
     ...process.env,
     ...import.meta.env,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   },
   emptyStringAsUndefined: true,
 })

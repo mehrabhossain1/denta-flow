@@ -14,6 +14,7 @@ import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as AccountRouteRouteImport } from './routes/account/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as PurchaseSuccessRouteImport } from './routes/purchase/success'
 import { Route as LegalTermsRouteImport } from './routes/legal/terms'
@@ -21,6 +22,9 @@ import { Route as LegalPrivacyRouteImport } from './routes/legal/privacy'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AuthAuthViewRouteImport } from './routes/auth/$authView'
 import { Route as AccountAccountViewRouteImport } from './routes/account/$accountView'
+import { Route as DashboardPatientsIndexRouteImport } from './routes/dashboard/patients/index'
+import { Route as DashboardAiBlogIndexRouteImport } from './routes/dashboard/ai-blog/index'
+import { Route as DashboardAiAssistantIndexRouteImport } from './routes/dashboard/ai-assistant/index'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 import { Route as ApiRssXmlRouteImport } from './routes/api/rss.xml'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -49,6 +53,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
@@ -85,6 +94,22 @@ const AccountAccountViewRoute = AccountAccountViewRouteImport.update({
   path: '/$accountView',
   getParentRoute: () => AccountRouteRoute,
 } as any)
+const DashboardPatientsIndexRoute = DashboardPatientsIndexRouteImport.update({
+  id: '/patients/',
+  path: '/patients/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardAiBlogIndexRoute = DashboardAiBlogIndexRouteImport.update({
+  id: '/ai-blog/',
+  path: '/ai-blog/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardAiAssistantIndexRoute =
+  DashboardAiAssistantIndexRouteImport.update({
+    id: '/ai-assistant/',
+    path: '/ai-assistant/',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   id: '/api/stripe/webhook',
   path: '/api/stripe/webhook',
@@ -104,7 +129,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRouteRouteWithChildren
-  '/dashboard': typeof DashboardRouteRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account/$accountView': typeof AccountAccountViewRoute
@@ -114,14 +139,17 @@ export interface FileRoutesByFullPath {
   '/legal/terms': typeof LegalTermsRoute
   '/purchase/success': typeof PurchaseSuccessRoute
   '/blog/': typeof BlogIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rss/xml': typeof ApiRssXmlRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/dashboard/ai-assistant/': typeof DashboardAiAssistantIndexRoute
+  '/dashboard/ai-blog/': typeof DashboardAiBlogIndexRoute
+  '/dashboard/patients/': typeof DashboardPatientsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRouteRouteWithChildren
-  '/dashboard': typeof DashboardRouteRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account/$accountView': typeof AccountAccountViewRoute
@@ -131,15 +159,19 @@ export interface FileRoutesByTo {
   '/legal/terms': typeof LegalTermsRoute
   '/purchase/success': typeof PurchaseSuccessRoute
   '/blog': typeof BlogIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rss/xml': typeof ApiRssXmlRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/dashboard/ai-assistant': typeof DashboardAiAssistantIndexRoute
+  '/dashboard/ai-blog': typeof DashboardAiBlogIndexRoute
+  '/dashboard/patients': typeof DashboardPatientsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRouteRouteWithChildren
-  '/dashboard': typeof DashboardRouteRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account/$accountView': typeof AccountAccountViewRoute
@@ -149,9 +181,13 @@ export interface FileRoutesById {
   '/legal/terms': typeof LegalTermsRoute
   '/purchase/success': typeof PurchaseSuccessRoute
   '/blog/': typeof BlogIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rss/xml': typeof ApiRssXmlRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/dashboard/ai-assistant/': typeof DashboardAiAssistantIndexRoute
+  '/dashboard/ai-blog/': typeof DashboardAiBlogIndexRoute
+  '/dashboard/patients/': typeof DashboardPatientsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -168,14 +204,17 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/purchase/success'
     | '/blog/'
+    | '/dashboard/'
     | '/api/auth/$'
     | '/api/rss/xml'
     | '/api/stripe/webhook'
+    | '/dashboard/ai-assistant/'
+    | '/dashboard/ai-blog/'
+    | '/dashboard/patients/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account'
-    | '/dashboard'
     | '/rss.xml'
     | '/sitemap.xml'
     | '/account/$accountView'
@@ -185,9 +224,13 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/purchase/success'
     | '/blog'
+    | '/dashboard'
     | '/api/auth/$'
     | '/api/rss/xml'
     | '/api/stripe/webhook'
+    | '/dashboard/ai-assistant'
+    | '/dashboard/ai-blog'
+    | '/dashboard/patients'
   id:
     | '__root__'
     | '/'
@@ -202,15 +245,19 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/purchase/success'
     | '/blog/'
+    | '/dashboard/'
     | '/api/auth/$'
     | '/api/rss/xml'
     | '/api/stripe/webhook'
+    | '/dashboard/ai-assistant/'
+    | '/dashboard/ai-blog/'
+    | '/dashboard/patients/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRouteRoute: typeof AccountRouteRouteWithChildren
-  DashboardRouteRoute: typeof DashboardRouteRoute
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   RssDotxmlRoute: typeof RssDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AuthAuthViewRoute: typeof AuthAuthViewRoute
@@ -261,6 +308,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
@@ -310,6 +364,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAccountViewRouteImport
       parentRoute: typeof AccountRouteRoute
     }
+    '/dashboard/patients/': {
+      id: '/dashboard/patients/'
+      path: '/patients'
+      fullPath: '/dashboard/patients/'
+      preLoaderRoute: typeof DashboardPatientsIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/ai-blog/': {
+      id: '/dashboard/ai-blog/'
+      path: '/ai-blog'
+      fullPath: '/dashboard/ai-blog/'
+      preLoaderRoute: typeof DashboardAiBlogIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/ai-assistant/': {
+      id: '/dashboard/ai-assistant/'
+      path: '/ai-assistant'
+      fullPath: '/dashboard/ai-assistant/'
+      preLoaderRoute: typeof DashboardAiAssistantIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/api/stripe/webhook': {
       id: '/api/stripe/webhook'
       path: '/api/stripe/webhook'
@@ -346,10 +421,28 @@ const AccountRouteRouteWithChildren = AccountRouteRoute._addFileChildren(
   AccountRouteRouteChildren,
 )
 
+interface DashboardRouteRouteChildren {
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardAiAssistantIndexRoute: typeof DashboardAiAssistantIndexRoute
+  DashboardAiBlogIndexRoute: typeof DashboardAiBlogIndexRoute
+  DashboardPatientsIndexRoute: typeof DashboardPatientsIndexRoute
+}
+
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardAiAssistantIndexRoute: DashboardAiAssistantIndexRoute,
+  DashboardAiBlogIndexRoute: DashboardAiBlogIndexRoute,
+  DashboardPatientsIndexRoute: DashboardPatientsIndexRoute,
+}
+
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRouteRoute: AccountRouteRouteWithChildren,
-  DashboardRouteRoute: DashboardRouteRoute,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
   RssDotxmlRoute: RssDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AuthAuthViewRoute: AuthAuthViewRoute,

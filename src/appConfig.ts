@@ -13,17 +13,17 @@ interface ConfigProps {
 }
 
 export default {
-  appName: 'BetterStarter',
-  url: 'betterstarter.dev',
+  appName: 'DentaFlow',
+  url: 'dentaflow.app',
   appDescription:
-    'Better Starter - Start Your Business Right. Launch fast, scale quickly, and be ready for the future.',
-  supportEmail: 'support@betterstarter.dev',
+    'AI-Powered Dental Practice Management. Streamline patient follow-ups, treatment explanations, and clinic content with AI.',
+  supportEmail: 'support@dentaflow.app',
   features: {
     blog: {
       enabled: true,
-      title: 'BetterStarter Blog',
+      title: 'DentaFlow Blog',
       description:
-        'Articles about BetterStarter, and launching your SaaS quickly and correctly.',
+        'AI-generated dental insights, treatment guides, and practice tips for your clinic.',
     },
   },
 } as ConfigProps

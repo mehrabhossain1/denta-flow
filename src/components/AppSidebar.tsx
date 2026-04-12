@@ -13,13 +13,16 @@ import {
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { BookOpen, LayoutDashboard, User } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Bot, FileText, LayoutDashboard, User, Users } from 'lucide-react'
 import type * as React from 'react'
 
 const navItems = [
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { title: 'Patients', href: '/dashboard/patients', icon: Users },
+  { title: 'AI Assistant', href: '/dashboard/ai-assistant', icon: Bot },
+  { title: 'AI Blog', href: '/dashboard/ai-blog', icon: FileText },
   { title: 'Account', href: '/account/settings', icon: User },
-  { title: 'Documentation', href: '/docs', icon: BookOpen },
 ]
 
 function SidebarLogo() {
@@ -33,13 +36,13 @@ function SidebarLogo() {
           asChild
           className={isCollapsed ? 'justify-center' : ''}
         >
-          <a href="/">
+          <Link to="/">
             {isCollapsed ? (
               <LogoIcon size="sm" />
             ) : (
               <Logo shouldLink={false} size="sm" />
             )}
-          </a>
+          </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
@@ -58,10 +61,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             {navItems.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild tooltip={item.title}>
-                  <a href={item.href}>
+                  <Link to={item.href}>
                     <item.icon />
                     <span>{item.title}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
