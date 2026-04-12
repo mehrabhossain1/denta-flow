@@ -17,9 +17,9 @@ export const env = createEnv({
   clientPrefix: 'VITE_',
   client: {
     VITE_GOOGLE_CLIENT_ID: z.string().min(1),
-    VITE_STRIPE_PROMOTION_CODE_ID: z.string().min(1),
     VITE_STRIPE_PRODUCT_CORE_ID: z.string().min(1),
-    VITE_STRIPE_PRICE_CORE_ONE_TIME_ID: z.string().min(1),
+    VITE_STRIPE_PRICE_MONTHLY_ID: z.string().min(1),
+    VITE_STRIPE_PRICE_ANNUAL_ID: z.string().min(1),
   },
   runtimeEnv: {
     ...process.env,

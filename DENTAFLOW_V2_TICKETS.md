@@ -47,41 +47,90 @@ Nothing works without real auth. No code changes needed -- just credentials + te
 
 ---
 
-## Phase 2: Stripe Payments
+## Phase 2: Stripe Subscription + Free/Paid Tiers
 
 > Depends on Phase 1 -- checkout ties to authenticated users.
+> **Model:** Free (10 AI requests/month) + Pro ($19/mo or $190/yr, unlimited AI)
 
-### V2-004: Create Stripe Products and Prices
+### V2-004: Update Environment & Billing Config for Subscriptions
+- **Priority:** Critical
+- **Type:** Code Change
+- **Description:** Convert from one-time payment to subscription model:
+  - Replace `VITE_STRIPE_PRICE_CORE_ONE_TIME_ID` with `VITE_STRIPE_PRICE_MONTHLY_ID` and `VITE_STRIPE_PRICE_ANNUAL_ID`
+  - Remove `VITE_STRIPE_PROMOTION_CODE_ID` (not needed for subscription MVP)
+  - Update `STRIPE_CONFIG` in billing constants: rename to "DentaFlow Pro", add MONTHLY/ANNUAL prices
+  - Update env validation in `src/env.ts`
+- **Files:** `src/env.ts`, `src/constants/billing.ts`, `.env.local`, `.env.sample`
+- **Status:** [ ]
+
+### V2-005: Create AI Usage Tracking System
+- **Priority:** Critical
+- **Type:** Code Change
+- **Description:** Track AI usage per user for free tier limits:
+  - New DB table `ai_usage`: id, userId (FK), action (text), createdAt
+  - New file `src/lib/billing/usage.ts` with:
+    - `getMonthlyUsage(userId)` -- count AI calls in current month
+    - `incrementUsage(userId, action)` -- insert usage row
+    - `canUseAI(userId)` -- active subscription → unlimited; else count < 10
+  - Run `pnpm db:generate` + `pnpm db:push`
+- **Files:** `src/db/schema/ai-usage.ts` (new), `src/lib/billing/usage.ts` (new)
+- **Status:** [ ]
+
+### V2-006: Gate AI Endpoints Behind Usage Check
+- **Priority:** Critical
+- **Type:** Code Change
+- **Description:** Add usage check + tracking to all AI server functions:
+  - Before each AI call, check `canUseAI(context.user.id)`
+  - If over limit, throw `AI_LIMIT_REACHED` error
+  - On success, call `incrementUsage(context.user.id, actionName)`
+  - Applies to: `generateFollowUp`, `explainTreatment`, `suggestPostCare`, `generateBlogPost`
+- **Files:** `src/lib/dental/ai.ts`
+- **Status:** [ ]
+
+### V2-007: Rewrite Pricing Section (Free vs Pro)
+- **Priority:** Critical
+- **Type:** Code Change
+- **Description:** Complete rewrite of pricing component:
+  - Two-card layout: Free (left) vs Pro (right, highlighted)
+  - Free: 10 AI requests/mo, patient management, blog -- "Get Started Free" → sign-up
+  - Pro: Unlimited AI, all features, monthly ($19) / annual ($190) toggle with savings badge
+  - Pro card uses `PurchaseButton` with `mode="subscription"`
+  - Wire `<PricingSection />` into `src/routes/index.tsx`
+- **Files:** `src/components/Landing/LandingPricing.tsx`, `src/routes/index.tsx`
+- **Status:** [ ]
+
+### V2-008: Add Usage Display in Dashboard
+- **Priority:** High
+- **Type:** Code Change
+- **Description:** Show subscription status and AI usage on dashboard:
+  - Free users: "3/10 AI requests used this month" with progress bar
+  - Paid users: "Unlimited" badge with plan name
+  - "Upgrade to Pro" CTA for free users
+- **Files:** `src/routes/dashboard/index.tsx`
+- **Status:** [ ]
+
+### V2-009: Show Upgrade Prompt When Limit Hit
+- **Priority:** High
+- **Type:** Code Change
+- **Description:** When AI call returns `AI_LIMIT_REACHED`:
+  - Show friendly upgrade modal/banner
+  - "You've used all 10 free AI requests this month. Upgrade to Pro for unlimited."
+  - Link to pricing section or direct checkout
+- **Files:** `src/routes/dashboard/ai-assistant/index.tsx`, `src/routes/dashboard/ai-blog/index.tsx`
+- **Status:** [ ]
+
+### V2-010: Stripe Dashboard Setup (User action)
 - **Priority:** Critical
 - **Type:** Configuration
 - **Description:** In Stripe Dashboard (test mode):
   - Create product: "DentaFlow Pro"
-  - Create a one-time price (or recurring if subscription model chosen)
-  - Optionally create a promotion code
-  - Record: product ID (`prod_*`), price ID (`price_*`), promo code ID (`promo_*`)
-- **Decision needed:** One-time payment vs subscription (monthly/annual)?
+  - Create recurring price: $19/month
+  - Create recurring price: $190/year
+  - Record product ID and both price IDs
+  - Update `.env.local` with real `STRIPE_SECRET_KEY`, `VITE_STRIPE_PRODUCT_CORE_ID`, `VITE_STRIPE_PRICE_MONTHLY_ID`, `VITE_STRIPE_PRICE_ANNUAL_ID`
 - **Status:** [ ]
 
-### V2-005: Configure Stripe Environment Variables
-- **Priority:** Critical
-- **Type:** Configuration
-- **Description:** Replace all placeholder Stripe values in `.env.local`:
-  - `STRIPE_SECRET_KEY` - real `sk_test_*` key
-  - `STRIPE_WEBHOOK_SECRET` - from webhook endpoint setup (V2-007)
-  - `VITE_STRIPE_PRODUCT_CORE_ID` - product ID from V2-004
-  - `VITE_STRIPE_PRICE_CORE_ONE_TIME_ID` - price ID from V2-004
-  - `VITE_STRIPE_PROMOTION_CODE_ID` - promo code ID (or remove if not using)
-- **Files:** `.env.local`
-- **Status:** [ ]
-
-### V2-006: Update Billing Constants
-- **Priority:** Medium
-- **Type:** Code Change
-- **Description:** Rename "BetterStarter Core" to "DentaFlow Pro" in billing constants.
-- **Files:** `src/constants/billing.ts` (line 29)
-- **Status:** [ ]
-
-### V2-007: Set Up Stripe Webhook (Local Dev)
+### V2-011: Set Up Stripe Webhook (Local Dev)
 - **Priority:** Critical
 - **Type:** Configuration
 - **Description:** Install Stripe CLI. Run:
@@ -89,42 +138,28 @@ Nothing works without real auth. No code changes needed -- just credentials + te
   stripe listen --forward-to localhost:3000/api/stripe/webhook
   ```
   Copy the webhook signing secret to `STRIPE_WEBHOOK_SECRET` in `.env.local`.
-- **Ref:** Webhook handler at `src/routes/api/stripe/webhook.ts`
 - **Events:** `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`
 - **Status:** [ ]
 
-### V2-008: Test Complete Payment Flow
+### V2-012: Test Complete Subscription Flow
 - **Priority:** Critical
 - **Type:** Testing
-- **Description:** End-to-end payment verification:
-  - Checkout session creation (authenticated + guest)
-  - Successful payment with test card `4242 4242 4242 4242`
-  - Webhook receipt and entitlement/subscription creation in DB
-  - Success page at `/purchase/success`
-  - Billing portal session via `createBillingPortalSession`
-  - Guest entitlement claiming (auto-triggered in dashboard route)
+- **Description:** End-to-end verification:
+  - New user → free tier, use 10 AI requests
+  - 11th request → blocked with upgrade prompt
+  - Subscribe ($19/mo) with test card `4242 4242 4242 4242`
+  - Webhook creates subscription in DB
+  - AI requests now unlimited
+  - Billing portal works (manage/cancel subscription)
+  - Cancel → back to free limits
+  - Landing page shows both plans with working checkout
 - **Status:** [ ]
 
 ---
 
-## Phase 3: Landing Page & Branding Polish
+## Phase 3: Branding Polish
 
-### V2-009: Wire Pricing Section into Landing Page
-- **Priority:** High
-- **Type:** Code Change
-- **Description:** The `PricingSection` component exists at `src/components/Landing/LandingPricing.tsx` but is NOT rendered on the landing page. Tasks:
-  - Import and render `<PricingSection />` in `src/routes/index.tsx` between `<DentaFlowHowItWorks />` and `<DentaFlowCTA />`
-  - Update pricing copy from BetterStarter features to DentaFlow features:
-    - "AI Follow-up Messages"
-    - "Treatment Explanations"
-    - "Post-Care Instructions"
-    - "SEO Blog Generator"
-    - "Patient Management"
-  - Update CTA text from "Get BetterStarter" to "Start with DentaFlow"
-- **Files:** `src/routes/index.tsx`, `src/components/Landing/LandingPricing.tsx`
-- **Status:** [ ]
-
-### V2-010: Update Web Manifest and Metadata
+### V2-013: Update Web Manifest and Metadata
 - **Priority:** Medium
 - **Type:** Code Change
 - **Description:** Update `public/site.webmanifest`:
@@ -134,7 +169,7 @@ Nothing works without real auth. No code changes needed -- just credentials + te
 - **Files:** `public/site.webmanifest`
 - **Status:** [ ]
 
-### V2-011: Update Terms of Service
+### V2-014: Update Terms of Service
 - **Priority:** Medium
 - **Type:** Code Change
 - **Description:** The Terms page still has BetterStarter-era content:
@@ -144,13 +179,14 @@ Nothing works without real auth. No code changes needed -- just credentials + te
 - **Files:** `src/routes/legal/terms.tsx`
 - **Status:** [ ]
 
-### V2-012: Clean Up Residual BetterStarter References
+### V2-015: Clean Up Residual BetterStarter References
 - **Priority:** Medium
 - **Type:** Code Change
 - **Description:** Search entire codebase for remaining "BetterStarter" strings and update:
   - Legal pages, pricing component, any comments or constants
   - Remove irrelevant brand logos (cvs-health.svg, deloitte.svg, starbucks.svg etc.) from `public/brands/` if used in a "trusted by" section
   - Verify privacy page content is DentaFlow-specific
+  - Update Plunk references to Resend
 - **Files:** Multiple
 - **Status:** [ ]
 
@@ -160,7 +196,7 @@ Nothing works without real auth. No code changes needed -- just credentials + te
 
 > Can run in parallel with Phase 3.
 
-### V2-013: Add Zod Input Validation to AI Endpoints
+### V2-016: Add Zod Input Validation to AI Endpoints
 - **Priority:** High
 - **Type:** Code Change
 - **Description:** All 5 AI server functions currently use unsafe `data as unknown as Type` casting with zero runtime validation. Add `.inputValidator(z.object({...}))` to each:
@@ -173,7 +209,7 @@ Nothing works without real auth. No code changes needed -- just credentials + te
 - **Files:** `src/lib/dental/ai.ts`
 - **Status:** [ ]
 
-### V2-014: Add Zod Input Validation to Patient CRUD
+### V2-017: Add Zod Input Validation to Patient CRUD
 - **Priority:** High
 - **Type:** Code Change
 - **Description:** Same treatment for patient server functions:
@@ -183,18 +219,7 @@ Nothing works without real auth. No code changes needed -- just credentials + te
 - **Files:** `src/lib/dental/server.ts`
 - **Status:** [ ]
 
-### V2-015: Add Rate Limiting to AI Endpoints
-- **Priority:** Medium
-- **Type:** Code Change
-- **Description:** AI endpoints have no rate limiting -- users can spam Gemini API calls. Implement:
-  - In-memory rate limiter: `Map<userId, { count, windowStart }>`
-  - Limit: ~50 AI calls per user per hour
-  - Create reusable `rateLimitMiddleware` chainable after `authMiddleware`
-  - Note: resets on serverless cold starts, acceptable for MVP
-- **Files:** New middleware file + `src/lib/dental/ai.ts`
-- **Status:** [ ]
-
-### V2-016: Configure Sentry for Production
+### V2-018: Configure Sentry for Production
 - **Priority:** Medium
 - **Type:** Code Change
 - **Description:** Sentry is initialized in `instrument-server.mjs` but needs proper config:
@@ -209,10 +234,10 @@ Nothing works without real auth. No code changes needed -- just credentials + te
 
 ## Phase 5: Blog Serverless Fix & Account Settings
 
-### V2-017: Fix Blog Save for Serverless Deployment
+### V2-019: Fix Blog Save for Serverless Deployment
 - **Priority:** Critical
 - **Type:** Code Change
-- **Description:** `saveBlogPost` in `src/lib/dental/ai.ts` uses `fs.writeFileSync` to write to `content/blog/` -- this **will fail on Netlify** (read-only filesystem). Solution:
+- **Description:** `saveBlogPost` in `src/lib/dental/ai.ts` uses `fs.writeFileSync` to write to `content/blog/` -- this **will fail on Netlify/Vercel** (read-only filesystem). Solution:
   1. Create new DB schema `src/db/schema/blog.ts` with `blog_post` table (id, slug, title, description, content, tags, authorId, publishedAt, draft, createdAt, updatedAt)
   2. Update `saveBlogPost` to insert into DB instead of writing files
   3. Update `getPublishedPosts` and `getBlogPost` in `src/lib/blog/func.server.ts` to merge results from content-collections (static posts) AND database (AI-generated posts), deduplicate by slug
@@ -220,20 +245,21 @@ Nothing works without real auth. No code changes needed -- just credentials + te
 - **Files:** `src/db/schema/blog.ts` (new), `src/lib/dental/ai.ts`, `src/lib/blog/func.server.ts`
 - **Status:** [ ]
 
-### V2-018: Add Account Index Route
+### V2-020: Add Account Index Route
 - **Priority:** Medium
 - **Type:** Code Change
 - **Description:** Navigating to `/account` shows a blank page because there's no index route (only `$accountView` dynamic route). Create `src/routes/account/index.tsx` that redirects to `/account/settings`.
 - **Files:** `src/routes/account/index.tsx` (new)
 - **Status:** [ ]
 
-### V2-019: Add Billing Status to Account Page
+### V2-021: Add Billing Status to Account Page
 - **Priority:** Medium
 - **Type:** Code Change
 - **Description:** Show subscription/entitlement status on account page:
   - Pull data from `getBillingStatus` server function (`src/lib/billing/server.ts`)
-  - Display current plan, subscription status, expiry date
-  - Add "Manage Billing" button linking to Stripe portal via `createBillingPortalSession`
+  - Display current plan (Free / Pro), subscription status, renewal date
+  - Add "Upgrade to Pro" or "Manage Billing" button
+  - Show AI usage count for free users
 - **Files:** Account route area
 - **Status:** [ ]
 
@@ -243,76 +269,72 @@ Nothing works without real auth. No code changes needed -- just credentials + te
 
 > Depends on all previous phases being complete.
 
-### V2-020: Configure Production Domain
+### V2-022: Configure Production Domain
 - **Priority:** Critical
 - **Type:** Configuration
-- **Description:** Set up `dentaflow.app` domain:
-  - Configure DNS with Netlify
-  - Update production `APP_BASE_URL` to `https://dentaflow.app`
-  - Update production `BETTER_AUTH_URL` to `https://dentaflow.app`
-- **Ref:** Domain already referenced in `src/appConfig.ts` line 18
+- **Description:** Set up custom domain:
+  - Configure DNS with Vercel
+  - Update production `APP_BASE_URL` and `BETTER_AUTH_URL`
 - **Status:** [ ]
 
-### V2-021: Set Production Environment Variables on Netlify
+### V2-023: Set Production Environment Variables
 - **Priority:** Critical
 - **Type:** Configuration
-- **Description:** Configure ALL env vars from `src/env.ts` in Netlify Dashboard:
-  - `APP_BASE_URL` = `https://dentaflow.app`
+- **Description:** Configure ALL env vars in Vercel Dashboard:
+  - `APP_BASE_URL`, `BETTER_AUTH_URL` = production domain
   - `DATABASE_URL` = production Neon connection string
-  - `BETTER_AUTH_URL` = `https://dentaflow.app`
   - `BETTER_AUTH_SECRET` = **generate new strong secret** for production
-  - `PLUNK_SECRET_API_KEY` = from V2-001
-  - `TRANSACTIONAL_EMAIL` = `noreply@dentaflow.app`
-  - `GOOGLE_CLIENT_SECRET` / `VITE_GOOGLE_CLIENT_ID` = from V2-002
+  - `RESEND_API_KEY` = from Phase 1
+  - `TRANSACTIONAL_EMAIL` = verified domain email or `onboarding@resend.dev`
+  - `GOOGLE_CLIENT_SECRET` / `VITE_GOOGLE_CLIENT_ID` = from Phase 1
   - `STRIPE_SECRET_KEY` = live mode key (or test for staging)
-  - `STRIPE_WEBHOOK_SECRET` = from production webhook (V2-023)
+  - `STRIPE_WEBHOOK_SECRET` = from production webhook
   - `GEMINI_API_KEY` = existing key
   - All `VITE_STRIPE_*` = production Stripe IDs
 - **Status:** [ ]
 
-### V2-022: Update Google OAuth Redirect URIs for Production
+### V2-024: Update Google OAuth Redirect URIs for Production
 - **Priority:** Critical
 - **Type:** Configuration
 - **Description:** In Google Cloud Console, add production redirect URI:
-  - `https://dentaflow.app/api/auth/callback/google`
+  - `https://yourdomain.com/api/auth/callback/google`
   - Keep localhost URI for local development
 - **Status:** [ ]
 
-### V2-023: Create Production Stripe Webhook
+### V2-025: Create Production Stripe Webhook
 - **Priority:** Critical
 - **Type:** Configuration
 - **Description:** In Stripe Dashboard, create production webhook endpoint:
-  - URL: `https://dentaflow.app/api/stripe/webhook`
+  - URL: `https://yourdomain.com/api/stripe/webhook`
   - Events: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`
   - If switching to live mode: create new products/prices and update `VITE_STRIPE_*` env vars
 - **Status:** [ ]
 
-### V2-024: Run Production Database Migration
+### V2-026: Run Production Database Migration
 - **Priority:** Critical
 - **Type:** Configuration
 - **Description:** Run `pnpm db:push` against production Neon database. Verify all tables exist:
   - Auth: `user`, `session`, `account`, `verification`
   - Dental: `patient`
-  - Billing: `billing_customer`, `subscription`, `entitlement`
-  - Blog: `blog_post` (from V2-017)
+  - Billing: `billing_customer`, `subscription`, `entitlement`, `ai_usage`
+  - Blog: `blog_post` (from V2-019)
 - **Status:** [ ]
 
-### V2-025: Build, Deploy, and Smoke Test
+### V2-027: Build, Deploy, and Smoke Test
 - **Priority:** Critical
 - **Type:** Testing
 - **Description:** Final production verification:
   1. Run `pnpm build` locally -- verify no errors
-  2. Deploy to Netlify (git push or manual deploy)
+  2. Deploy to Vercel
   3. Smoke test all flows in production:
      - Sign up / sign in (email OTP + Google)
      - Add a patient, search, delete
-     - Use all 3 AI assistant tabs
+     - Use AI features (verify free limit works)
+     - Subscribe to Pro, verify unlimited AI
      - Generate and publish a blog post
-     - Complete a test purchase
      - Check account settings + billing status
-  4. Verify Sentry receives events
-  5. Verify Stripe webhooks deliver successfully
-  6. Set up uptime monitoring
+  4. Verify Stripe webhooks deliver successfully
+  5. Set up uptime monitoring
 - **Status:** [ ]
 
 ---
@@ -321,9 +343,9 @@ Nothing works without real auth. No code changes needed -- just credentials + te
 
 | Phase | Tickets | Focus | Depends On |
 |-------|---------|-------|------------|
-| 1 | V2-001 to V2-003 | Auth & Email | None |
-| 2 | V2-004 to V2-008 | Stripe Payments | Phase 1 |
-| 3 | V2-009 to V2-012 | Landing & Branding | Phase 2 (pricing needs Stripe IDs) |
-| 4 | V2-013 to V2-016 | Security Hardening | None (parallel with Phase 3) |
-| 5 | V2-017 to V2-019 | Blog Fix & Account | None (parallel with Phase 3-4) |
-| 6 | V2-020 to V2-025 | Production Deploy | All previous phases |
+| 1 | V2-001 to V2-003 | Auth & Email (Resend + Google OAuth) | None | **DONE** |
+| 2 | V2-004 to V2-012 | Stripe Subscriptions + Free/Paid Tiers + Usage Tracking | Phase 1 |
+| 3 | V2-013 to V2-015 | Branding Polish | None |
+| 4 | V2-016 to V2-018 | Security Hardening | None (parallel with Phase 3) |
+| 5 | V2-019 to V2-021 | Blog Fix & Account | None (parallel with Phase 3-4) |
+| 6 | V2-022 to V2-027 | Production Deploy | All previous phases |

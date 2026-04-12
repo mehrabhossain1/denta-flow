@@ -5,6 +5,7 @@ import { env } from '@/env'
 import { authMiddleware } from '@/lib/auth/middleware'
 import { provider } from '@/lib/billing/providers'
 import type { CheckoutMode, LineItem } from '@/lib/billing/types'
+import { canUseAI, getMonthlyUsage } from '@/lib/billing/usage'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 
@@ -141,4 +142,22 @@ export const claimGuestEntitlements = createServerFn({ method: 'POST' })
       claimed: guestEntitlements.length,
       claimedSubscriptions: guestSubs.length,
     }
+  })
+
+/**
+ * Returns the user's AI usage status for the current month.
+ */
+export const getAIUsageStatus = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    if (!context.user) {
+      return {
+        allowed: true,
+        usage: 0,
+        limit: BILLING_CONFIG.FREE_AI_LIMIT,
+        isPro: false,
+      }
+    }
+
+    return canUseAI(context.user.id)
   })

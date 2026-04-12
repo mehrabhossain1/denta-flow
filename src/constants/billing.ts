@@ -9,6 +9,7 @@ export const BILLING_CONFIG = {
   ACTIVE_PROVIDER: BILLING_PROVIDERS.STRIPE,
   SUCCESS_PATH: '/purchase/success',
   CANCEL_PATH: '/#pricing',
+  FREE_AI_LIMIT: 10,
 } as const
 
 import { env } from '@/env'
@@ -18,13 +19,13 @@ import { env } from '@/env'
  * Prices are nested under their parent product.
  */
 export const STRIPE_CONFIG = {
-  PROMOTION_CODE_ID: env.VITE_STRIPE_PROMOTION_CODE_ID,
   PRODUCTS: {
     CORE: {
       id: env.VITE_STRIPE_PRODUCT_CORE_ID,
-      name: 'BetterStarter Core',
+      name: 'DentaFlow Pro',
       prices: {
-        ONE_TIME: env.VITE_STRIPE_PRICE_CORE_ONE_TIME_ID,
+        MONTHLY: env.VITE_STRIPE_PRICE_MONTHLY_ID,
+        ANNUAL: env.VITE_STRIPE_PRICE_ANNUAL_ID,
       },
     },
   },

@@ -1,4 +1,5 @@
 import { authMiddleware } from '@/lib/auth/middleware'
+import { canUseAI, incrementUsage } from '@/lib/billing/usage'
 import { createServerFn } from '@tanstack/react-start'
 
 // ─── Types ───────────────────────────────────────────────────────────
@@ -47,6 +48,11 @@ export const generateFollowUp = createServerFn({ method: 'POST' })
       throw new Error('UNAUTHORIZED')
     }
 
+    const usageCheck = await canUseAI(context.user.id)
+    if (!usageCheck.allowed) {
+      throw new Error('AI_LIMIT_REACHED')
+    }
+
     const input = data as unknown as GenerateFollowUpInput
 
     const prompt = `Generate a follow-up message for a dental patient.
@@ -69,6 +75,7 @@ Rules:
 Return ONLY the message text, no extra formatting or explanation.`
 
     const message = await callGemini(prompt)
+    await incrementUsage(context.user.id, 'follow-up')
     return { message }
   })
 
@@ -79,6 +86,11 @@ export const explainTreatment = createServerFn({ method: 'POST' })
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')
+    }
+
+    const usageCheck = await canUseAI(context.user.id)
+    if (!usageCheck.allowed) {
+      throw new Error('AI_LIMIT_REACHED')
     }
 
     const input = data as unknown as ExplainTreatmentInput
@@ -114,8 +126,10 @@ Return ONLY valid JSON, no markdown fences.`
         whatToExpect: string[]
         aftercareTips: string[]
       }
+      await incrementUsage(context.user.id, 'treatment-explanation')
       return parsed
     } catch {
+      await incrementUsage(context.user.id, 'treatment-explanation')
       return {
         explanation: text,
         whatToExpect: [] as string[],
@@ -131,6 +145,11 @@ export const suggestPostCare = createServerFn({ method: 'POST' })
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')
+    }
+
+    const usageCheck = await canUseAI(context.user.id)
+    if (!usageCheck.allowed) {
+      throw new Error('AI_LIMIT_REACHED')
     }
 
     const input = data as unknown as SuggestPostCareInput
@@ -168,8 +187,10 @@ Return ONLY valid JSON, no markdown fences.`
         warningSignsToWatch: string[]
         generalNote: string
       }
+      await incrementUsage(context.user.id, 'post-care')
       return parsed
     } catch {
+      await incrementUsage(context.user.id, 'post-care')
       return {
         careInstructions: [text],
         avoidList: [] as string[],
@@ -205,6 +226,11 @@ export const generateBlogPost = createServerFn({ method: 'POST' })
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')
+    }
+
+    const usageCheck = await canUseAI(context.user.id)
+    if (!usageCheck.allowed) {
+      throw new Error('AI_LIMIT_REACHED')
     }
 
     const input = data as unknown as GenerateBlogPostInput
@@ -247,8 +273,10 @@ Return ONLY valid JSON, no markdown fences.`
         tags: string[]
         content: string
       }
+      await incrementUsage(context.user.id, 'blog-post')
       return parsed
     } catch {
+      await incrementUsage(context.user.id, 'blog-post')
       return {
         title: input.topic,
         description: '',
