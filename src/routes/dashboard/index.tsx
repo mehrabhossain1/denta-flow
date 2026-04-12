@@ -7,10 +7,11 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getAIUsageStatus } from '@/lib/billing/server'
 import { listPatients } from '@/lib/dental/server'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Bot, FileText, Users } from 'lucide-react'
+import { Bot, Crown, FileText, Sparkles, Users, Zap } from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard/')({
   component: DashboardOverview,
@@ -20,6 +21,11 @@ function DashboardOverview() {
   const { data: patients, isLoading } = useQuery({
     queryKey: ['patients'],
     queryFn: () => listPatients(),
+  })
+
+  const { data: usageStatus, isLoading: usageLoading } = useQuery({
+    queryKey: ['ai-usage-status'],
+    queryFn: () => getAIUsageStatus(),
   })
 
   const patientCount = patients?.length ?? 0
@@ -33,7 +39,8 @@ function DashboardOverview() {
         </p>
       </div>
 
-      <div className="px-4 lg:px-6">
+      <div className="px-4 lg:px-6 grid gap-4 sm:grid-cols-2">
+        {/* Patient count card */}
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Total Patients</CardDescription>
@@ -49,6 +56,77 @@ function DashboardOverview() {
                 ? 'Add your first patient to get started'
                 : `${patientCount} patient${patientCount !== 1 ? 's' : ''} in your practice`}
             </p>
+          </CardContent>
+        </Card>
+
+        {/* AI Usage card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription className="flex items-center gap-1.5">
+              <Sparkles className="size-3.5" />
+              AI Usage This Month
+            </CardDescription>
+            {usageLoading ? (
+              <Skeleton className="h-8 w-24" />
+            ) : usageStatus?.isPro ? (
+              <CardTitle className="text-3xl flex items-center gap-2">
+                <Crown className="size-6 text-amber-500" />
+                Pro
+              </CardTitle>
+            ) : (
+              <CardTitle className="text-3xl">
+                {usageStatus?.usage ?? 0}
+                <span className="text-lg text-muted-foreground font-normal">
+                  /{usageStatus?.limit ?? 10}
+                </span>
+              </CardTitle>
+            )}
+          </CardHeader>
+          <CardContent>
+            {usageLoading ? (
+              <Skeleton className="h-4 w-32" />
+            ) : usageStatus?.isPro ? (
+              <p className="text-xs text-muted-foreground">
+                Unlimited AI requests with your Pro plan
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {/* Progress bar */}
+                <div className="h-2 w-full rounded-full bg-muted">
+                  <div
+                    className={`h-2 rounded-full transition-all ${
+                      (usageStatus?.usage ?? 0) >= (usageStatus?.limit ?? 10)
+                        ? 'bg-destructive'
+                        : (usageStatus?.usage ?? 0) >=
+                            (usageStatus?.limit ?? 10) * 0.7
+                          ? 'bg-amber-500'
+                          : 'bg-primary'
+                    }`}
+                    style={{
+                      width: `${Math.min(((usageStatus?.usage ?? 0) / (usageStatus?.limit ?? 10)) * 100, 100)}%`,
+                    }}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    {(usageStatus?.usage ?? 0) >= (usageStatus?.limit ?? 10)
+                      ? 'Limit reached'
+                      : `${(usageStatus?.limit ?? 10) - (usageStatus?.usage ?? 0)} requests remaining`}
+                  </p>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="h-6 text-xs gap-1"
+                  >
+                    <a href="/#pricing">
+                      <Zap className="size-3" />
+                      Upgrade
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

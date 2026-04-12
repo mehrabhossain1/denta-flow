@@ -19,18 +19,33 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { getAIUsageStatus } from '@/lib/billing/server'
 import { generateBlogPost, saveBlogPost } from '@/lib/dental/ai'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Bot, Check, ExternalLink, FileText } from 'lucide-react'
+import { Bot, Check, ExternalLink, FileText, Zap } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+
+function isLimitError(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('AI_LIMIT_REACHED')
+}
 
 export const Route = createFileRoute('/dashboard/ai-blog/')({
   component: AIBlogPage,
 })
 
 function AIBlogPage() {
+  const queryClient = useQueryClient()
+  const { data: usageStatus } = useQuery({
+    queryKey: ['ai-usage-status'],
+    queryFn: () => getAIUsageStatus(),
+  })
+
+  const limitReached =
+    usageStatus && !usageStatus.isPro && usageStatus.usage >= usageStatus.limit
+
   const [topic, setTopic] = useState('')
   const [keywords, setKeywords] = useState('')
   const [audience, setAudience] = useState<'patients' | 'parents' | 'general'>(
@@ -75,9 +90,15 @@ function AIBlogPage() {
       setEditTitle(data.title)
       setEditDescription(data.description)
       setPublishedSlug(null)
+      queryClient.invalidateQueries({ queryKey: ['ai-usage-status'] })
     },
-    onError: () => {
-      toast.error('Failed to generate blog post. Please try again.')
+    onError: (error) => {
+      if (isLimitError(error)) {
+        queryClient.invalidateQueries({ queryKey: ['ai-usage-status'] })
+        toast.error('AI limit reached. Upgrade to Pro for unlimited access.')
+      } else {
+        toast.error('Failed to generate blog post. Please try again.')
+      }
     },
   })
 
@@ -120,6 +141,31 @@ function AIBlogPage() {
           </Link>
         </Button>
       </div>
+
+      {limitReached && (
+        <div className="px-4 lg:px-6">
+          <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
+            <Zap className="size-4 text-amber-600" />
+            <AlertDescription className="flex items-center justify-between gap-4">
+              <span className="text-sm">
+                You've used all 10 free AI requests this month. Upgrade to Pro
+                for unlimited access.
+              </span>
+              <Button
+                asChild
+                size="sm"
+                variant="default"
+                className="shrink-0 gap-1"
+              >
+                <a href="/#pricing">
+                  <Zap className="size-3" />
+                  Upgrade to Pro
+                </a>
+              </Button>
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
 
       <div className="px-4 lg:px-6">
         <Card>

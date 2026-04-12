@@ -22,13 +22,14 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+import { getAIUsageStatus } from '@/lib/billing/server'
 import {
   explainTreatment,
   generateFollowUp,
   suggestPostCare,
 } from '@/lib/dental/ai'
 import { listPatients } from '@/lib/dental/server'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   AlertTriangle,
@@ -39,9 +40,34 @@ import {
   MessageSquare,
   ShieldCheck,
   Stethoscope,
+  Zap,
 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+
+function isLimitError(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('AI_LIMIT_REACHED')
+}
+
+function UpgradeBanner() {
+  return (
+    <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
+      <Zap className="size-4 text-amber-600" />
+      <AlertDescription className="flex items-center justify-between gap-4">
+        <span className="text-sm">
+          You've used all 10 free AI requests this month. Upgrade to Pro for
+          unlimited access.
+        </span>
+        <Button asChild size="sm" variant="default" className="shrink-0 gap-1">
+          <a href="/#pricing">
+            <Zap className="size-3" />
+            Upgrade to Pro
+          </a>
+        </Button>
+      </AlertDescription>
+    </Alert>
+  )
+}
 
 export const Route = createFileRoute('/dashboard/ai-assistant/')({
   component: AIAssistantPage,
@@ -50,6 +76,7 @@ export const Route = createFileRoute('/dashboard/ai-assistant/')({
 // ─── Follow-up Messages Tab ──────────────────────────────────────────
 
 function FollowUpTab() {
+  const queryClient = useQueryClient()
   const { data: patients } = useQuery({
     queryKey: ['patients'],
     queryFn: () => listPatients(),
@@ -80,9 +107,15 @@ function FollowUpTab() {
       }),
     onSuccess: (data) => {
       setResult(data.message)
+      queryClient.invalidateQueries({ queryKey: ['ai-usage-status'] })
     },
-    onError: () => {
-      toast.error('Failed to generate message. Please try again.')
+    onError: (error) => {
+      if (isLimitError(error)) {
+        queryClient.invalidateQueries({ queryKey: ['ai-usage-status'] })
+        toast.error('AI limit reached. Upgrade to Pro for unlimited access.')
+      } else {
+        toast.error('Failed to generate message. Please try again.')
+      }
     },
   })
 
@@ -244,6 +277,7 @@ function FollowUpTab() {
 // ─── Treatment Explanation Tab ───────────────────────────────────────
 
 function ExplanationTab() {
+  const queryClient = useQueryClient()
   const [procedure, setProcedure] = useState('')
   const [patientAge, setPatientAge] = useState('')
   const [concern, setConcern] = useState('')
@@ -266,9 +300,15 @@ function ExplanationTab() {
       }),
     onSuccess: (data) => {
       setResult(data)
+      queryClient.invalidateQueries({ queryKey: ['ai-usage-status'] })
     },
-    onError: () => {
-      toast.error('Failed to generate explanation. Please try again.')
+    onError: (error) => {
+      if (isLimitError(error)) {
+        queryClient.invalidateQueries({ queryKey: ['ai-usage-status'] })
+        toast.error('AI limit reached. Upgrade to Pro for unlimited access.')
+      } else {
+        toast.error('Failed to generate explanation. Please try again.')
+      }
     },
   })
 
@@ -419,6 +459,7 @@ function ExplanationTab() {
 // ─── Post-Care Instructions Tab ──────────────────────────────────────
 
 function PostCareTab() {
+  const queryClient = useQueryClient()
   const [treatment, setTreatment] = useState('')
   const [patientAge, setPatientAge] = useState('')
   const [severity, setSeverity] = useState<'minor' | 'moderate' | 'major'>(
@@ -446,9 +487,15 @@ function PostCareTab() {
       }),
     onSuccess: (data) => {
       setResult(data)
+      queryClient.invalidateQueries({ queryKey: ['ai-usage-status'] })
     },
-    onError: () => {
-      toast.error('Failed to generate instructions. Please try again.')
+    onError: (error) => {
+      if (isLimitError(error)) {
+        queryClient.invalidateQueries({ queryKey: ['ai-usage-status'] })
+        toast.error('AI limit reached. Upgrade to Pro for unlimited access.')
+      } else {
+        toast.error('Failed to generate instructions. Please try again.')
+      }
     },
   })
 
@@ -640,6 +687,14 @@ function PostCareTab() {
 // ─── Main Page ───────────────────────────────────────────────────────
 
 function AIAssistantPage() {
+  const { data: usageStatus } = useQuery({
+    queryKey: ['ai-usage-status'],
+    queryFn: () => getAIUsageStatus(),
+  })
+
+  const limitReached =
+    usageStatus && !usageStatus.isPro && usageStatus.usage >= usageStatus.limit
+
   return (
     <div className="flex flex-col gap-6 py-4 md:py-6">
       <div className="px-4 lg:px-6">
@@ -649,6 +704,12 @@ function AIAssistantPage() {
           assistive only.
         </p>
       </div>
+
+      {limitReached && (
+        <div className="px-4 lg:px-6">
+          <UpgradeBanner />
+        </div>
+      )}
 
       <div className="px-4 lg:px-6">
         <Tabs defaultValue="follow-up">

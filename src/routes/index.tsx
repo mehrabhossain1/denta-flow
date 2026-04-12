@@ -5,6 +5,7 @@ import { DentaFlowCTA } from '@/components/Landing/DentaFlowCTA'
 import { DentaFlowFeatures } from '@/components/Landing/DentaFlowFeatures'
 import { DentaFlowHero } from '@/components/Landing/DentaFlowHero'
 import { DentaFlowHowItWorks } from '@/components/Landing/DentaFlowHowItWorks'
+import { PricingSection } from '@/components/Landing/LandingPricing'
 import { generateCompleteSEO } from '@/lib/seo'
 import { createFileRoute } from '@tanstack/react-router'
 
@@ -27,6 +28,7 @@ function RouteComponent() {
         <DentaFlowHero />
         <DentaFlowFeatures />
         <DentaFlowHowItWorks />
+        <PricingSection />
         <DentaFlowCTA />
       </main>
       <Footer />
