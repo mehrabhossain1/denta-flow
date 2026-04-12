@@ -11,6 +11,7 @@ import { useSession } from '@/lib/auth/client'
 import {
   claimGuestEntitlements,
   getCheckoutSession,
+  syncSubscriptionFromCheckout,
 } from '@/lib/billing/server'
 import { generatePageSEO } from '@/lib/seo'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -49,12 +50,23 @@ function PurchaseSuccess() {
     enabled: !!session_id,
   })
 
-  // Claim guest entitlements when a logged-in user visits the success page
-  const claimMutation = useMutation({
-    mutationFn: () => claimGuestEntitlements(),
+  // Sync subscription from Stripe and claim guest entitlements
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      if (session_id) {
+        await (
+          syncSubscriptionFromCheckout as unknown as (args: {
+            data: { sessionId: string }
+          }) => Promise<{ synced: boolean }>
+        )({
+          data: { sessionId: session_id },
+        })
+      }
+      await claimGuestEntitlements()
+    },
   })
 
-  const { mutate, isPending, isSuccess } = claimMutation
+  const { mutate, isPending, isSuccess } = syncMutation
 
   useEffect(() => {
     if (isLoggedIn && !isPending && !isSuccess) {
@@ -112,7 +124,7 @@ function PurchaseSuccess() {
             </CardTitle>
             <CardDescription>
               {isPaid
-                ? 'Your order has been confirmed and you now have access to BetterStarter.'
+                ? 'Your subscription is active! You now have unlimited AI access with DentaFlow Pro.'
                 : 'Please wait while we confirm your payment.'}
             </CardDescription>
           </CardHeader>
@@ -138,8 +150,9 @@ function PurchaseSuccess() {
                   {isLoggedIn ? (
                     <div className="space-y-3">
                       <p className="text-sm text-muted-foreground">
-                        Your purchase has been linked to your account. Head to
-                        your dashboard to access your content.
+                        Your Pro subscription has been linked to your account.
+                        Head to your dashboard to start using unlimited AI
+                        features.
                       </p>
                       <Button asChild className="w-full">
                         <Link to="/dashboard" className="flex gap-2">

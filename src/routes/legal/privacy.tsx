@@ -8,7 +8,7 @@ export const Route = createFileRoute('/legal/privacy')({
   head: () => ({
     meta: generatePageSEO({
       title: 'Privacy Policy',
-      description: 'Privacy Policy for BetterStarter',
+      description: 'Privacy Policy for DentaFlow',
     }),
   }),
   component: PrivacyPage,

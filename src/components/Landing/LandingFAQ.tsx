@@ -5,92 +5,51 @@ import { SectionHeader } from '../_common/SectionHeader'
 
 const FAQ_ITEMS = [
   {
-    question: 'What exactly do I get?',
-    answer: `
-        BetterStarter is available as a one-time purchase with lifetime access to the GitHub repository containing a Full-Stack, AI-Ready, TypeScript-based starter boilerplate.
-        
-        - GitHub code Access with lifetime access to make unlimited projects
-        - Public documentation on how to use BetterStarter
-      `,
-  },
-  {
-    question: 'Do I need to be an experienced developer?',
+    question: 'What is DentaFlow?',
     answer:
-      'While experience with React and TypeScript helps, the starter is designed to be accessible. You get detailed documentation and the code is well-structured. If you get stuck, post a question on the GitHub repo and get answers.',
+      'DentaFlow is an AI-powered dental practice management tool. It helps dentists generate patient follow-up messages, explain treatments in simple language, create post-care instructions, and publish SEO blog content — all powered by AI.',
   },
   {
-    question: 'Can I customize it for my needs?',
-    answer:
-      'Absolutely! This is your codebase. You have full access to all source code and can modify anything. The modular structure makes it easy to add features, change styles, or integrate with other services.',
-  },
-  {
-    question: 'Which database does it support?',
-    answer: `BetterStarter is set up with Drizzle ORM and PostgreSQL.
-      
-      You can host your PostgreSQL DB at Supabase, Neon, Vercel DB, Cloud, or your own server.
-      
-      Simply add your database URL in the code, and you're done.
-      
-      You can also easily swap Postgres out with other databases supported by Drizzle ORM like MySQL, SQLite, or others.`,
-  },
-  {
-    question: 'Can my startup have subscription and one-time payment plans?',
-    answer:
-      'Yes! The Stripe setup supports both Subscription and One-time payment plans for your startup.',
-  },
-  {
-    question: 'Can I use it for multiple projects?',
-    answer:
-      'Yes! Your license allows you to use BetterStarter for unlimited projects. You can even use it as a starting point for clients or products you build.',
-  },
-  {
-    question: 'How often is it updated?',
-    answer:
-      'BetterStarter is actively maintained and updated regularly. Your purchase includes lifetime updates, so you always have access to the latest versions and features.',
-  },
-  {
-    question: 'Is there support included?',
-    answer: `Yes, you get access to our documentation and priority support. When stuck, simply post a GitHub issue on the repo, and we'll get to it immediately.`,
-  },
-  {
-    question: 'Can I get a refund?',
-    answer: `Once you get access to the GitHub repo, BetterStarter is yours forever and it cannot be refunded.
-      `,
-  },
-  {
-    question: 'Where do I host my app?',
-    answer: `
-      Anywhere you like. BetterStarter is hosting agnostic and can be hosted on Vercel, Cloudflare, AWS, or your own server.
-      `,
-  },
-  {
-    question: 'Can I vibe code with Cursor, Copilot, etc.?',
-    answer: `
-      Yes! BetterStarter works with any coding editor, any vibe coding tool - Cursor, VS Code, IntelliJ, Antigravity, Kiro, Claude Code, etc.
+    question: 'Is DentaFlow free to use?',
+    answer: `Yes! DentaFlow offers a free tier with 10 AI requests per month. This includes all features:
+      - AI follow-up messages
+      - Treatment explanations
+      - Post-care instructions
+      - Patient management
 
-      BetterStarter has special instructions for vibe-coding tools built-in to guide them for best output.
-      `,
+      Upgrade to Pro ($19/mo) for unlimited AI requests.`,
   },
   {
-    question: `Why don't I use Lovable, Replit or just vibe code this?`,
-    answer: `
-      Lovable and Replit are great for prototyping and building landing pages.
-
-
-      Vibe coding is great (I use it myself), however, you need a solid starting point.
-
-      With BetterStarter you get
-      - A good starting point (no blank slate)
-      - Skip days of prompting to get it right
-      - Skip troubleshooting bugs AI created
-      - Skip over thinking what to do
-      - Skip doubting if the AI did it right
-      - Skip worry if the stack is right
-      - Skip vendor-lock
-      - Skip over-engineered bloated code
-      
-      Once you have a good starting point with BetterStarter, your startup has a solid foundation for growth and acceleration with AI and vibe coding.
-      `,
+    question: 'Is the AI content medically accurate?',
+    answer:
+      'All AI-generated content is assistive only and should be reviewed by a qualified dental professional before sharing with patients. DentaFlow helps you draft content faster, but the final review and approval is always yours.',
+  },
+  {
+    question: 'What AI features are included?',
+    answer: `DentaFlow includes four AI-powered tools:
+      - Follow-up message generator (WhatsApp, SMS, email)
+      - Treatment explanation generator (simple or detailed)
+      - Post-care instruction generator (with allergy awareness)
+      - SEO blog post generator for your clinic website`,
+  },
+  {
+    question: 'Can I manage my patients in DentaFlow?',
+    answer:
+      'Yes! DentaFlow includes a patient management system where you can add, search, and organize your patient records. Patient details can be used with AI tools for personalized content.',
+  },
+  {
+    question: 'How does the Pro plan work?',
+    answer: `Pro gives you unlimited AI requests for $19/month or $190/year (save 17%). You can upgrade, downgrade, or cancel anytime from your account settings. No long-term commitment required.`,
+  },
+  {
+    question: 'Is my patient data secure?',
+    answer:
+      'Yes. All data is encrypted in transit and at rest. Patient records are tied to your authenticated account and are not shared with other users. AI processing happens server-side and patient data is not used to train AI models.',
+  },
+  {
+    question: 'Can I cancel my subscription?',
+    answer:
+      'Yes, you can cancel anytime from your account settings. After cancellation, you keep Pro access until the end of your billing period, then revert to the free tier with 10 AI requests per month.',
   },
 ]
 
@@ -161,21 +120,12 @@ export function FAQSection() {
           title="Frequently asked questions"
           description={
             <span>
-              Have another question? Contact me on{' '}
+              Have another question? Contact us at{' '}
               <a
-                href="https://x.com/heyaziz"
-                className="underline underline-offset-4"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Twitter
-              </a>{' '}
-              or by{' '}
-              <a
-                href="mailto:support@ilovecoding.org"
+                href="mailto:support@dentaflow.app"
                 className="underline underline-offset-4"
               >
-                email
+                support@dentaflow.app
               </a>
               .
             </span>

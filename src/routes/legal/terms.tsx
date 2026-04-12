@@ -8,14 +8,14 @@ export const Route = createFileRoute('/legal/terms')({
   head: () => ({
     meta: generatePageSEO({
       title: 'Terms of Service',
-      description: 'Terms of Service for BetterStarter',
+      description: 'Terms of Service for DentaFlow',
     }),
   }),
   component: TermsPage,
 })
 
 function TermsPage() {
-  const lastUpdated = 'November 8, 2025'
+  const lastUpdated = 'April 12, 2026'
 
   return (
     <PageLayout showHeader showFooter>
@@ -42,10 +42,12 @@ function TermsPage() {
             2. Description of Service
           </h2>
           <p className="text-muted-foreground mb-4">
-            {config.appName} is a platform that allows users to create and
-            manage public profiles. Users can create profiles for themselves or
-            for public figures they admire. The service includes user-generated
-            content and profile management features.
+            {config.appName} is an AI-powered dental practice management
+            platform. The service provides tools for patient management,
+            AI-generated follow-up messages, treatment explanations, post-care
+            instructions, and SEO blog content generation. All AI-generated
+            content is assistive only and should be reviewed by qualified dental
+            professionals before use with patients.
           </p>
         </section>
 

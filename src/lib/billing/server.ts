@@ -1,13 +1,14 @@
-import { BILLING_CONFIG } from '@/constants/billing'
+import { BILLING_CONFIG, BILLING_PROVIDERS } from '@/constants/billing'
 import { db } from '@/db'
-import { entitlement, subscription } from '@/db/schema'
+import { billingCustomer, entitlement, subscription } from '@/db/schema'
 import { env } from '@/env'
 import { authMiddleware } from '@/lib/auth/middleware'
 import { provider } from '@/lib/billing/providers'
 import type { CheckoutMode, LineItem } from '@/lib/billing/types'
 import { canUseAI, getMonthlyUsage } from '@/lib/billing/usage'
 import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
+import Stripe from 'stripe'
 
 type CreateCheckoutInput = {
   mode: CheckoutMode
@@ -93,6 +94,112 @@ export const getCheckoutSession = createServerFn({ method: 'GET' })
       throw new Error('SESSION_ID_REQUIRED')
     }
     return provider.getCheckoutSession(input.sessionId)
+  })
+
+/**
+ * Syncs subscription status from Stripe after checkout.
+ * Fallback for when webhooks aren't configured.
+ */
+export const syncSubscriptionFromCheckout = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .handler(async ({ context, data }) => {
+    if (!context.user) {
+      throw new Error('UNAUTHORIZED')
+    }
+
+    const input = data as unknown as { sessionId: string }
+    if (!input.sessionId) {
+      throw new Error('SESSION_ID_REQUIRED')
+    }
+
+    const stripe = new Stripe(env.STRIPE_SECRET_KEY)
+    const session = await stripe.checkout.sessions.retrieve(input.sessionId)
+
+    if (session.payment_status !== 'paid') {
+      return { synced: false }
+    }
+
+    // If it's a subscription checkout, sync the subscription
+    if (
+      session.mode === 'subscription' &&
+      typeof session.subscription === 'string'
+    ) {
+      const sub = await stripe.subscriptions.retrieve(session.subscription)
+      const subId = sub.id
+      const status = sub.status
+      const priceId = sub.items.data[0]?.price?.id
+      const productRef = sub.items.data[0]?.price?.product
+      const productId =
+        typeof productRef === 'string' ? productRef : productRef?.id
+
+      const periodStart = (sub as unknown as { current_period_start?: number })
+        .current_period_start
+      const periodEnd = (sub as unknown as { current_period_end?: number })
+        .current_period_end
+
+      // Check if subscription already exists
+      const existing = await db.query.subscription.findFirst({
+        where: (s, { and: _and, eq: _eq }) =>
+          _and(
+            _eq(s.subscriptionId, subId),
+            _eq(s.provider, BILLING_PROVIDERS.STRIPE),
+          ),
+      })
+
+      const values = {
+        provider: BILLING_PROVIDERS.STRIPE,
+        subscriptionId: subId,
+        userId: context.user.id,
+        guestEmail: null,
+        status,
+        priceId,
+        productId,
+        currentPeriodStart: periodStart ? new Date(periodStart * 1000) : null,
+        currentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : null,
+        cancelAt: sub.cancel_at ? new Date(sub.cancel_at * 1000) : null,
+        canceledAt: sub.canceled_at ? new Date(sub.canceled_at * 1000) : null,
+        trialEnd: sub.trial_end ? new Date(sub.trial_end * 1000) : null,
+      }
+
+      if (existing) {
+        await db
+          .update(subscription)
+          .set(values)
+          .where(
+            and(
+              eq(subscription.subscriptionId, subId),
+              eq(subscription.provider, BILLING_PROVIDERS.STRIPE),
+            ),
+          )
+      } else {
+        await db.insert(subscription).values({
+          id: crypto.randomUUID(),
+          ...values,
+        })
+      }
+
+      // Also ensure billing customer mapping exists
+      const existingCustomer = await db.query.billingCustomer.findFirst({
+        where: (bc, { and: _and, eq: _eq }) =>
+          _and(
+            _eq(bc.userId, context.user!.id),
+            _eq(bc.provider, BILLING_PROVIDERS.STRIPE),
+          ),
+      })
+
+      if (!existingCustomer && typeof sub.customer === 'string') {
+        await db.insert(billingCustomer).values({
+          id: crypto.randomUUID(),
+          provider: BILLING_PROVIDERS.STRIPE,
+          customerId: sub.customer,
+          userId: context.user.id,
+        })
+      }
+
+      return { synced: true, status }
+    }
+
+    return { synced: false }
   })
 
 /**
