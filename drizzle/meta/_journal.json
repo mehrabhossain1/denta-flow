@@ -15,6 +15,13 @@
       "when": 1775986546301,
       "tag": "0001_kind_sentry",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776173569089,
+      "tag": "0002_supreme_black_tarantula",
+      "breakpoints": true
     }
   ]
 }

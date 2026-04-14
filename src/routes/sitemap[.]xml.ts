@@ -26,7 +26,7 @@ interface SitemapUrl {
   priority?: number
 }
 
-function generateSitemap() {
+async function generateSitemap() {
   const siteUrl = `https://${appConfig.url}`
   const urls: SitemapUrl[] = []
 
@@ -63,7 +63,7 @@ function generateSitemap() {
   })
 
   // Blog posts
-  const posts = getPublishedPosts()
+  const posts = await getPublishedPosts()
   for (const post of posts) {
     urls.push({
       loc: `${siteUrl}/blog/${post.slug}`,
@@ -104,7 +104,7 @@ export const Route = createFileRoute('/sitemap.xml')({
   server: {
     handlers: {
       GET: async () => {
-        const content = generateSitemap()
+        const content = await generateSitemap()
 
         setResponseHeader('Content-Type', 'application/xml; charset=utf-8')
         setResponseHeader(

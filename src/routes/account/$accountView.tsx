@@ -1,3 +1,4 @@
+import { BillingStatusCard } from '@/components/account/BillingStatusCard'
 import { AUTH_ROUTES } from '@/constants/auth'
 import { useSession } from '@/lib/auth/client'
 import { generatePageSEO } from '@/lib/seo'
@@ -57,7 +58,8 @@ function Settings() {
   }
 
   return (
-    <div className="px-4 py-4 lg:px-6 lg:py-6">
+    <div className="px-4 py-4 lg:px-6 lg:py-6 space-y-6">
+      {accountView === 'settings' && <BillingStatusCard />}
       <AccountView pathname={accountView} />
     </div>
   )

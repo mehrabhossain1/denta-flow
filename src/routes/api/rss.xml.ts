@@ -19,8 +19,9 @@ function formatAuthors(authors: string[]): string {
   return `${authors.slice(0, -1).join(', ')}, and ${authors[authors.length - 1]}`
 }
 
-function generateRSSFeed() {
-  const posts = getPublishedPosts().slice(0, 50) // Most recent 50 posts
+async function generateRSSFeed() {
+  const allPosts = await getPublishedPosts()
+  const posts = allPosts.slice(0, 50) // Most recent 50 posts
   const siteUrl = `https://${appConfig.url}`
   const buildDate = new Date().toUTCString()
 
@@ -62,7 +63,7 @@ export const Route = createFileRoute('/api/rss/xml')({
   server: {
     handlers: {
       GET: async () => {
-        const content = generateRSSFeed()
+        const content = await generateRSSFeed()
 
         setResponseHeader('Content-Type', 'application/xml; charset=utf-8')
         setResponseHeader(

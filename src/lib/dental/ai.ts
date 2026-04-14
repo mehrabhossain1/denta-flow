@@ -1,3 +1,5 @@
+import { db } from '@/db'
+import { blogPost } from '@/db/schema'
 import { authMiddleware } from '@/lib/auth/middleware'
 import { canUseAI, incrementUsage } from '@/lib/billing/usage'
 import { createServerFn } from '@tanstack/react-start'
@@ -342,34 +344,35 @@ export const saveBlogPost = createServerFn({ method: 'POST' })
     }
 
     const input = data as unknown as SaveBlogPostInput
-    const fs = await import('node:fs')
-    const path = await import('node:path')
 
-    const slug = input.title
+    const baseSlug = input.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
 
-    const today = new Date().toISOString().split('T')[0]
+    // Ensure slug uniqueness by suffixing if a row already exists
+    let slug = baseSlug
+    let attempt = 1
+    while (
+      await db.query.blogPost.findFirst({
+        where: (p, { eq }) => eq(p.slug, slug),
+      })
+    ) {
+      attempt += 1
+      slug = `${baseSlug}-${attempt}`
+    }
 
-    const frontmatter = [
-      '---',
-      `title: "${input.title.replace(/"/g, '\\"')}"`,
-      `description: "${input.description.replace(/"/g, '\\"')}"`,
-      `published: ${today}`,
-      'authors:',
-      '  - DentaFlow AI',
-      'draft: false',
-      `tags: [${input.tags.map((t) => `"${t}"`).join(', ')}]`,
-      '---',
-    ].join('\n')
-
-    const fileContent = `${frontmatter}\n\n${input.content}\n`
-
-    const blogDir = path.resolve(process.cwd(), 'content', 'blog')
-    const filePath = path.join(blogDir, `${slug}.md`)
-
-    fs.writeFileSync(filePath, fileContent, 'utf-8')
+    await db.insert(blogPost).values({
+      id: crypto.randomUUID(),
+      slug,
+      title: input.title,
+      description: input.description,
+      content: input.content,
+      tags: input.tags,
+      authors: ['DentaFlow AI'],
+      authorId: context.user.id,
+      draft: false,
+    })
 
     return { slug }
   })

@@ -16,6 +16,7 @@ import { Route as AccountRouteRouteImport } from './routes/account/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as AccountIndexRouteImport } from './routes/account/index'
 import { Route as PurchaseSuccessRouteImport } from './routes/purchase/success'
 import { Route as LegalTermsRouteImport } from './routes/legal/terms'
 import { Route as LegalPrivacyRouteImport } from './routes/legal/privacy'
@@ -63,6 +64,11 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AccountRouteRoute,
 } as any)
 const PurchaseSuccessRoute = PurchaseSuccessRouteImport.update({
   id: '/purchase/success',
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/purchase/success': typeof PurchaseSuccessRoute
+  '/account/': typeof AccountIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -149,7 +156,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/account': typeof AccountRouteRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account/$accountView': typeof AccountAccountViewRoute
@@ -158,6 +164,7 @@ export interface FileRoutesByTo {
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/purchase/success': typeof PurchaseSuccessRoute
+  '/account': typeof AccountIndexRoute
   '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -180,6 +187,7 @@ export interface FileRoutesById {
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/purchase/success': typeof PurchaseSuccessRoute
+  '/account/': typeof AccountIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -203,6 +211,7 @@ export interface FileRouteTypes {
     | '/legal/privacy'
     | '/legal/terms'
     | '/purchase/success'
+    | '/account/'
     | '/blog/'
     | '/dashboard/'
     | '/api/auth/$'
@@ -214,7 +223,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/account'
     | '/rss.xml'
     | '/sitemap.xml'
     | '/account/$accountView'
@@ -223,6 +231,7 @@ export interface FileRouteTypes {
     | '/legal/privacy'
     | '/legal/terms'
     | '/purchase/success'
+    | '/account'
     | '/blog'
     | '/dashboard'
     | '/api/auth/$'
@@ -244,6 +253,7 @@ export interface FileRouteTypes {
     | '/legal/privacy'
     | '/legal/terms'
     | '/purchase/success'
+    | '/account/'
     | '/blog/'
     | '/dashboard/'
     | '/api/auth/$'
@@ -321,6 +331,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/account/': {
+      id: '/account/'
+      path: '/'
+      fullPath: '/account/'
+      preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof AccountRouteRoute
     }
     '/purchase/success': {
       id: '/purchase/success'
@@ -411,10 +428,12 @@ declare module '@tanstack/react-router' {
 
 interface AccountRouteRouteChildren {
   AccountAccountViewRoute: typeof AccountAccountViewRoute
+  AccountIndexRoute: typeof AccountIndexRoute
 }
 
 const AccountRouteRouteChildren: AccountRouteRouteChildren = {
   AccountAccountViewRoute: AccountAccountViewRoute,
+  AccountIndexRoute: AccountIndexRoute,
 }
 
 const AccountRouteRouteWithChildren = AccountRouteRoute._addFileChildren(
