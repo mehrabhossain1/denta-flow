@@ -1,6 +1,7 @@
 import { authMiddleware } from '@/lib/auth/middleware'
 import { canUseAI, incrementUsage } from '@/lib/billing/usage'
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -43,6 +44,16 @@ async function callGemini(prompt: string): Promise<string> {
 
 export const generateFollowUp = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
+  .inputValidator(
+    z.object({
+      patientName: z.string().trim().min(1).max(100),
+      treatment: z.string().trim().min(1).max(200),
+      daysAfterTreatment: z.number().int().min(0).max(365),
+      tone: z.enum(['friendly', 'formal']),
+      channel: z.enum(['whatsapp', 'sms', 'email']),
+      clinicName: z.string().trim().min(1).max(100),
+    }),
+  )
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')
@@ -83,6 +94,14 @@ Return ONLY the message text, no extra formatting or explanation.`
 
 export const explainTreatment = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
+  .inputValidator(
+    z.object({
+      procedure: z.string().trim().min(1).max(200),
+      patientAge: z.string().trim().max(20),
+      patientConcern: z.string().trim().max(500),
+      language: z.enum(['simple', 'detailed']),
+    }),
+  )
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')
@@ -142,6 +161,15 @@ Return ONLY valid JSON, no markdown fences.`
 
 export const suggestPostCare = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
+  .inputValidator(
+    z.object({
+      treatment: z.string().trim().min(1).max(200),
+      patientAge: z.string().trim().max(20),
+      severity: z.enum(['minor', 'moderate', 'major']),
+      hasAllergies: z.boolean(),
+      allergyDetails: z.string().trim().max(500),
+    }),
+  )
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')
@@ -223,6 +251,16 @@ type SaveBlogPostInput = {
 
 export const generateBlogPost = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
+  .inputValidator(
+    z.object({
+      topic: z.string().trim().min(1).max(200),
+      targetAudience: z.enum(['patients', 'parents', 'general']),
+      keywords: z.array(z.string().trim().max(50)).max(20),
+      tone: z.enum(['educational', 'conversational', 'professional']),
+      wordCount: z.enum(['500-800', '800-1200', '1200-1500']),
+      clinicName: z.string().trim().min(1).max(100),
+    }),
+  )
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')
@@ -290,6 +328,14 @@ Return ONLY valid JSON, no markdown fences.`
 
 export const saveBlogPost = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
+  .inputValidator(
+    z.object({
+      title: z.string().trim().min(1).max(200),
+      description: z.string().trim().max(500),
+      tags: z.array(z.string().trim().max(50)).max(20),
+      content: z.string().trim().min(1).max(50000),
+    }),
+  )
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')

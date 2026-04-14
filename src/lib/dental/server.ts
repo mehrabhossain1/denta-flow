@@ -3,6 +3,7 @@ import { patient } from '@/db/schema'
 import { authMiddleware } from '@/lib/auth/middleware'
 import { createServerFn } from '@tanstack/react-start'
 import { and, eq, ilike, or } from 'drizzle-orm'
+import { z } from 'zod'
 
 type CreatePatientInput = {
   name: string
@@ -21,6 +22,13 @@ type ListPatientsInput = {
 
 export const listPatients = createServerFn({ method: 'GET' })
   .middleware([authMiddleware])
+  .inputValidator(
+    z
+      .object({
+        search: z.string().trim().max(100).optional(),
+      })
+      .optional(),
+  )
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')
@@ -48,6 +56,14 @@ export const listPatients = createServerFn({ method: 'GET' })
 
 export const createPatient = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
+  .inputValidator(
+    z.object({
+      name: z.string().trim().min(1).max(100),
+      email: z.string().trim().max(200).email().optional().or(z.literal('')),
+      phone: z.string().trim().max(20).optional().or(z.literal('')),
+      notes: z.string().trim().max(1000).optional().or(z.literal('')),
+    }),
+  )
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')
@@ -76,6 +92,11 @@ export const createPatient = createServerFn({ method: 'POST' })
 
 export const deletePatient = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
+  .inputValidator(
+    z.object({
+      patientId: z.string().uuid(),
+    }),
+  )
   .handler(async ({ context, data }) => {
     if (!context.user) {
       throw new Error('UNAUTHORIZED')
